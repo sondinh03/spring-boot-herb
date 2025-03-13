@@ -1,12 +1,7 @@
-
 -- Bảng Disease Group
 DROP TABLE IF EXISTS disease_group;
 CREATE TABLE disease_group (
                                id INT AUTO_INCREMENT PRIMARY KEY,
-                               create_date DATETIME,
-                               created_by VARCHAR(255),
-                               modify_date DATETIME,
-                               modified_by VARCHAR(255),
                                group_name VARCHAR(255) NOT NULL,
                                description VARCHAR(255)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -15,10 +10,6 @@ CREATE TABLE disease_group (
 DROP TABLE IF EXISTS plant_family;
 CREATE TABLE plant_family (
                               id INT AUTO_INCREMENT PRIMARY KEY,
-                              create_date DATETIME,
-                              created_by VARCHAR(255),
-                              modify_date DATETIME,
-                              modified_by VARCHAR(255),
                               family_name VARCHAR(255) NOT NULL,
                               description VARCHAR(255)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -40,34 +31,33 @@ CREATE TABLE plant (
                        distribution VARCHAR(255),
                        description VARCHAR(255),
                        content TEXT,
+                       search_count INT,
                        FOREIGN KEY (plant_family_id) REFERENCES plant_family(id),
                        FOREIGN KEY (disease_group_id) REFERENCES disease_group(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng Image
+DROP TABLE IF EXISTS file;
+CREATE TABLE file (
+                      id INT AUTO_INCREMENT PRIMARY KEY,
+                      name VARCHAR(255) NOT NULL,
+                      path VARCHAR(255) NOT NULL,
+                      description VARCHAR(255),
+                      type VARCHAR(50),
+                      size INT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS image;
 CREATE TABLE image (
-                       id INT AUTO_INCREMENT PRIMARY KEY,
-                       create_date DATETIME,
-                       created_by VARCHAR(255),
-                       modify_date DATETIME,
-                       modified_by VARCHAR(255),
-                       name VARCHAR(255) NOT NULL,
-                       path VARCHAR(255) NOT NULL,
+                       id INT PRIMARY KEY,
                        is_primary BOOLEAN,
-                       description VARCHAR(255),
-                       type VARCHAR(50),
-                       size INT
+                       FOREIGN KEY (id) REFERENCES file(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Bảng User
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
                       id INT AUTO_INCREMENT PRIMARY KEY,
-                      create_date DATETIME,
-                      created_by VARCHAR(255),
-                      modify_date DATETIME,
-                      modified_by VARCHAR(255),
                       username VARCHAR(255) NOT NULL UNIQUE,
                       email VARCHAR(255) NOT NULL UNIQUE,
                       password VARCHAR(255) NOT NULL,
@@ -112,10 +102,6 @@ CREATE TABLE comment (
 DROP TABLE IF EXISTS keyword;
 CREATE TABLE keyword (
                          id INT AUTO_INCREMENT PRIMARY KEY,
-                         create_date DATETIME,
-                         created_by VARCHAR(255),
-                         modify_date DATETIME,
-                         modified_by VARCHAR(255),
                          name VARCHAR(255) NOT NULL,
                          type INT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -146,6 +132,6 @@ CREATE TABLE search_log (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             user_id INT,
                             query VARCHAR(255) NOT NULL,
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (user_id) REFERENCES user(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -7,20 +7,29 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Setter
+@Table(name = "file")
 @Getter
-@Table(name = "plant_family")
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlantFamily {
+public class File {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "family_name")
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "path")
+    private String path;
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "size")
+    private Long size;
 }

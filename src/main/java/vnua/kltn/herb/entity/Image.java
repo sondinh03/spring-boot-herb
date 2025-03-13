@@ -7,20 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Setter
+@Table(name = "image")
 @Getter
-@Table(name = "plant_family")
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlantFamily {
+public class Image {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "family_name")
-    private String name;
-
-    @Column(name = "description")
-    private String description;
+    @Column(name = "name")
+    private Boolean isPrimary;
 }

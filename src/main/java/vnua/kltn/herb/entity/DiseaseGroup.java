@@ -9,16 +9,16 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name = "plant_family")
+@Table(name = "disease_group")
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlantFamily {
+public class DiseaseGroup {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "family_name")
+    @Column(name = "group_name")
     private String name;
 
     @Column(name = "description")
