@@ -14,9 +14,7 @@ import vnua.kltn.herb.entity.PlantImage;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.PlantImageRepository;
 import vnua.kltn.herb.repository.PlantRepository;
-import vnua.kltn.herb.service.PlantImageService;
 import vnua.kltn.herb.service.PlantService;
-import vnua.kltn.herb.service.mapper.PlantImageMapper;
 import vnua.kltn.herb.service.mapper.PlantMapper;
 import vnua.kltn.herb.utils.PageUtils;
 
@@ -26,7 +24,6 @@ public class PlantServiceImpl implements PlantService {
     private final PlantRepository plantRepo;
     private final PlantMapper plantMapper;
     private final PlantImageRepository plantImageRepo;
-    private final PlantImageService plantImageService;
 
     @Override
     @Transactional
@@ -40,9 +37,9 @@ public class PlantServiceImpl implements PlantService {
         var imageIds = requestDto.getImageIds();
         if (imageIds != null && !imageIds.isEmpty()) {
             boolean isPrimarySet = false;
-            for (Long fileId : imageIds) {
+            for (Long imageId : imageIds) {
                 var plantImageEntity = new PlantImage();
-                plantImageEntity.setFileId(fileId);
+                plantImageEntity.setImageId(imageId);
                 plantImageEntity.setPlantId(plant.getId());
                 plantImageEntity.setIsPrimary(!isPrimarySet);
                 plantImageRepo.save(plantImageEntity);

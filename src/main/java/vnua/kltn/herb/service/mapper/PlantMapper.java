@@ -12,10 +12,8 @@ public interface PlantMapper {
     PlantResponseDto entityToResponse(Plant entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "image", ignore = true)
     Plant requestToEntity(PlantRequestDto dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "image", ignore = true)
     void setValue(PlantRequestDto requestDto, @MappingTarget Plant entity);
 }
