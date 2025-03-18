@@ -1,23 +1,26 @@
 package vnua.kltn.herb.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "image")
+@Table(name = "plant_iamge")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image {
+public class PlantImage {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "plant_id")
+    private Long plantId;
+
+    @Column(name = "file_id")
+    private Long fileId;
+
+    @Column(name = "is_primary")
     private Boolean isPrimary;
 }

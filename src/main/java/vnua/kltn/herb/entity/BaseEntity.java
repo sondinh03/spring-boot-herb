@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
-public abstract class BaseLogEntity {
+public abstract class BaseEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

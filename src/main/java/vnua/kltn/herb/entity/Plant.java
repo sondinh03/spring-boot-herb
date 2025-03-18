@@ -1,6 +1,5 @@
 package vnua.kltn.herb.entity;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -15,12 +14,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Plant extends BaseLogEntity {
+public class Plant extends BaseEntity {
     @Column(name = "vietnamese_name")
     private String vietnameseName;
 
     @Column(name = "scientific_name")
     private String scientificName;
+
+    @Column(name = "other_name")
+    private String otherName;
 
     @Column(name = "plant_family_id")
     private Long planFamilyId;
@@ -43,6 +45,30 @@ public class Plant extends BaseLogEntity {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "chemical_composition")
+    private String chemicalComposition;
+
+    @Column(name = "medicinal_properties")
+    private String medicinalProperties;
+
+    @Column(name = "harvesting_processing")
+    private String harvestingProcessing;
+
+    @Column(name = "dosage")
+    private String dosage;
+
+    @Column(name = "contraindications")
+    private String contraindications;
+
+    @Column(name = "url_slug")
+    private String slug;
+
     @Column(name = "search_count")
     private Long searchCount;
+
+    @Column(name = "is_featured")
+    private Boolean isFeatured;
+
+    @Column(name = "is_published")
+    private Boolean isPublished;
 }

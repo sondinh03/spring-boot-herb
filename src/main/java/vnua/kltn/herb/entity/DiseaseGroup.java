@@ -12,15 +12,19 @@ import lombok.Setter;
 @Table(name = "disease_group")
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiseaseGroup {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class DiseaseGroup extends BaseEntity {
     @Column(name = "group_name")
     private String name;
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "url_slug")
+    private String slug;
+
+    @Column(name = "display_order")
+    private Integer displayOrder;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
 }

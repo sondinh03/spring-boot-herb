@@ -1,10 +1,7 @@
 package vnua.kltn.herb.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Setter
@@ -12,15 +9,19 @@ import lombok.Setter;
 @Table(name = "plant_family")
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlantFamily {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class PlantFamily extends BaseEntity {
     @Column(name = "family_name")
     private String name;
 
+    @Column(name = "scientific_name")
+    private String scientificName;
+
     @Column(name = "description")
     private String description;
+
+    @Column(name = "url_slug")
+    private String slug;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
 }
