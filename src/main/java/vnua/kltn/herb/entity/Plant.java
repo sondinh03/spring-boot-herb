@@ -31,7 +31,7 @@ public class Plant extends BaseEntity {
     private Long diseaseGroupId;
 
     @Column(name = "image_url")
-    private String image;
+    private String imageUrl;
 
     @Column(name = "uses")
     private String uses;

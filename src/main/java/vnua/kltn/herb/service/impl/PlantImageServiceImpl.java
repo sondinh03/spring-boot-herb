@@ -30,7 +30,7 @@ public class PlantImageServiceImpl implements PlantImageService {
 
         var plantImage = new PlantImage();
         plantImage.setPlantId(requestDto.getPlantId());
-        plantImage.setFileId(requestDto.getFileId());
+        plantImage.setImageId(requestDto.getImageId());
         return plantImageRepo.save(plantImage);
     }
 
@@ -38,6 +38,6 @@ public class PlantImageServiceImpl implements PlantImageService {
         if (!plantRepository.existsById(requestDto.getPlantId())) {
             return false;
         }
-        return fileRepo.existsById(requestDto.getFileId());
+        return fileRepo.existsById(requestDto.getImageId());
     }
 }
