@@ -1,19 +1,15 @@
 package vnua.kltn.herb.service.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import vnua.kltn.herb.dto.UserDto;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.entity.Plant;
+import vnua.kltn.herb.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface PlantMapper {
-    PlantResponseDto entityToResponse(Plant entity);
+    PlantResponseDto entityToResponse(Plant plant);
 
-    @Mapping(target = "id", ignore = true)
-    Plant requestToEntity(PlantRequestDto dto);
-
-    @Mapping(target = "id", ignore = true)
-    void setValue(PlantRequestDto requestDto, @MappingTarget Plant entity);
+    Plant requestToEntity(PlantRequestDto plantRequestDto);
 }

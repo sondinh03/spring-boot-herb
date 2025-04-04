@@ -1,74 +1,124 @@
 package vnua.kltn.herb.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-@Entity
-@Table(name = "plant")
-@Getter
-@Setter
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "plants")
 public class Plant extends BaseEntity {
-    @Column(name = "vietnamese_name")
-    private String vietnameseName;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "scientific_name")
+    @Column(name = "scientific_name", nullable = false)
     private String scientificName;
 
-    @Column(name = "other_name")
-    private String otherName;
-
-    @Column(name = "plant_family_id")
-    private Long planFamilyId;
-
-    @Column(name = "disease_group_id")
-    private Long diseaseGroupId;
-
-    @Column(name = "image_url")
-    private String imageUrl;
-
-    @Column(name = "uses")
-    private String uses;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "distribution")
-    private String distribution;
-
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "chemical_composition")
-    private String chemicalComposition;
-
-    @Column(name = "medicinal_properties")
-    private String medicinalProperties;
-
-    @Column(name = "harvesting_processing")
-    private String harvestingProcessing;
-
-    @Column(name = "dosage")
-    private String dosage;
-
-    @Column(name = "contraindications")
-    private String contraindications;
-
-    @Column(name = "url_slug")
+    @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(name = "search_count")
-    private Long searchCount;
+    private String family;
 
-    @Column(name = "is_featured")
-    private Boolean isFeatured;
+    private String genus;
 
-    @Column(name = "is_published")
-    private Boolean isPublished;
+    @Column(name = "other_names")
+    private String otherNames;
+
+    @Column(name = "parts_used")
+    private String partsUsed;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "botanical_characteristics", columnDefinition = "TEXT")
+    private String botanicalCharacteristics;
+
+    @Column(name = "chemical_composition", columnDefinition = "TEXT")
+    private String chemicalComposition;
+
+    @Column(columnDefinition = "TEXT")
+    private String distribution;
+
+    private String altitude;
+
+    @Column(name = "harvest_season")
+    private String harvestSeason;
+
+    @Column(columnDefinition = "TEXT")
+    private String ecology;
+
+    @Column(name = "medicinal_uses", columnDefinition = "TEXT")
+    private String medicinalUses;
+
+    @Column(columnDefinition = "TEXT")
+    private String indications;
+
+    @Column(columnDefinition = "TEXT")
+    private String contraindications;
+
+    @Column(columnDefinition = "TEXT")
+    private String dosage;
+
+    @Column(name = "folk_remedies", columnDefinition = "TEXT")
+    private String folkRemedies;
+
+    @Column(name = "side_effects", columnDefinition = "TEXT")
+    private String sideEffects;
+
+    @Column(nullable = false)
+    private Integer status = 1; // Default: DRAFT
+
+    private Boolean featured = false;
+
+    private Integer views = 0;
+
+    /*
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
+    @ManyToMany
+    @JoinTable(
+            name = "plant_categories",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
+
+    @ManyToMany
+    @JoinTable(
+            name = "plant_media",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "media_id")
+    )
+    private List<Media> media;
+
+    @ManyToMany
+    @JoinTable(
+            name = "plant_tags",
+            joinColumns = @JoinColumn(name = "plant_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
+
+    @ManyToMany(mappedBy = "plants")
+    private List<Article> articles;
+
+    @ManyToMany(mappedBy = "plants")
+    private List<Expert> experts;
+
+    @ManyToMany(mappedBy = "plants")
+    private List<Research> research;
+
+     */
 }

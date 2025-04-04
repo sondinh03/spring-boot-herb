@@ -11,8 +11,11 @@ public enum ErrorCodeEnum {
     PLAN_FAMILY_EXIST(400_001, "Họ thực vật đã tồn tại."),
     PLAN_IS_EXIST(400_002, "Cây dược liệu đã có trong cơ sở dữ liệu."),
     FILE_NOT_EMPTY(400_003, "File không được trống."),
-    FILE_UPLOAD_ERROR(400_004, "File không thể lưu.")
-
+    FILE_UPLOAD_ERROR(400_004, "File không thể lưu."),
+    EXISTED_USERNAME(400_005, "Tên đăng nhập đã tồn tại"),
+    EXISTED_EMAIL(400_406, "Địa chỉ email đã được sử dụng"),
+    CONFIRM_PASSWORD_ERROR(400_407, "Xác nhận mật khẩu và ật khảu chủa khơớp. "),
+    UNAUTHORIZED(401, "Unauthorized"),
     ;
 
     private final int errorCode;

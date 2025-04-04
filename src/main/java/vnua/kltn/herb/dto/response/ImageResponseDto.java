@@ -11,8 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ImageResponseDto {
     private Long id;
-    private String caption;
-    private String altText;
     private Boolean isPrimary;
-    private Integer displayOrder;
 }
