@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
@@ -13,9 +14,11 @@ import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.entity.Plant;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.PlantRepository;
+import vnua.kltn.herb.service.BaseSearchService;
 import vnua.kltn.herb.service.PlantService;
 import vnua.kltn.herb.service.mapper.PlantMapper;
 import vnua.kltn.herb.utils.PageUtils;
+import vnua.kltn.herb.utils.SlugGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +26,13 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
-public class PlantServiceImpl implements PlantService {
+public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto> implements PlantService  {
     private final PlantRepository plantRepo;
     private final PlantMapper plantMapper;
+    private final SlugGenerator slugGenerator;
 
     @Override
+    @Transactional
     public PlantResponseDto create(PlantRequestDto requestDto) throws HerbException {
         if (plantRepo.existsByName(requestDto.getName())
                 || plantRepo.existsByScientificName(requestDto.getScientificName())) {
@@ -35,15 +40,18 @@ public class PlantServiceImpl implements PlantService {
         }
 
         var plantEntity = plantMapper.requestToEntity(requestDto);
+        plantEntity.setSlug(SlugGenerator.generateSlug(plantEntity.getName()));
         plantRepo.save(plantEntity);
         return plantMapper.entityToResponse(plantEntity);
     }
 
     @Override
-    public PlantResponseDto findById(Long id) {
-        return null;
+    public PlantResponseDto getById(Long id) throws HerbException {
+        var plantEntity = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+        return plantMapper.entityToResponse(plantEntity);
     }
 
+    /*
     @Override
     public Page<PlantResponseDto> search(SearchDto searchDto) {
         Specification<Plant> spec = (root, query, criteriaBuilder) -> {
@@ -109,5 +117,20 @@ public class PlantServiceImpl implements PlantService {
         // Thực hiện truy vấn
         Page<Plant> plants = plantRepo.findAll(spec, pageable);
         return plants.map(plantMapper::entityToResponse);
+    }
+
+     */
+    public Page<PlantResponseDto> search(SearchDto searchDto) {
+        List<String> searchableFields = List.of("name", "scientificName", "description");
+        return super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
+    }
+
+    @Override
+    public Boolean update(Long id, PlantRequestDto requestDto) throws HerbException {
+        var plant = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+
+        plantMapper.setValue(requestDto, plant);
+        plantRepo.save(plant);
+        return true;
     }
 }

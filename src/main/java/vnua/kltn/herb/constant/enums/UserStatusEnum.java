@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum UserStatusEnum {
-    ACTIVE(1, "Active"),
-    INACTIVE(2, "Inactive"),
-    BLOCKED(3, "Blocked"),
+    ACTIVE(1, "Hoạt động"),
+    INACTIVE(2, "Không hoạt động"),
+    BLOCKED(3, "Đã chặn"),
     ;
     
     private final Integer type;

@@ -1,8 +1,8 @@
 package vnua.kltn.herb.service.mapper;
 
-import ch.qos.logback.core.model.ComponentModel;
 import org.mapstruct.Mapper;
-import vnua.kltn.herb.dto.UserDto;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import vnua.kltn.herb.dto.request.UserRequestDto;
 import vnua.kltn.herb.dto.response.UserResponseDto;
 import vnua.kltn.herb.entity.User;
@@ -11,5 +11,10 @@ import vnua.kltn.herb.entity.User;
 public interface UserMapper {
     UserResponseDto entityToResponse(User user);
 
+    @Mapping(target = "password", ignore = true)
     User requestToEntity(UserRequestDto userRequestDto);
+
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    void setValue(UserRequestDto requestDto, @MappingTarget User user);
 }

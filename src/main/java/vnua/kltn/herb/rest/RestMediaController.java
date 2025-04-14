@@ -38,15 +38,11 @@ public class RestMediaController {
      * Xem media (không download, dùng cho các loại có thể hiển thị trực tiếp như ảnh, video)
      */
     @GetMapping("/view/{id}")
-    public ResponseEntity<Resource> view(@PathVariable("id") Long id) throws HerbException, IOException {
+    public HerbResponse<Resource> view(@PathVariable("id") Long id) throws HerbException, IOException {
         var mediaInfo = mediaService.getById(id);
         var data = mediaService.getData(id);
 
         var resource = new ByteArrayResource(data);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(mediaInfo.getMimeType()))
-                .contentLength(mediaInfo.getFileSize())
-                .body(resource);
+        return new HerbResponse<>(resource);
     }
-
 }

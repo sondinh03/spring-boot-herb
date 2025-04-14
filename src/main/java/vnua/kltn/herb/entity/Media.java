@@ -30,15 +30,4 @@ public class Media extends BaseEntity {
 
     @Column(name = "uploaded_by")
     private Long uploadedBy;
-
-    /*
-    @OneToMany(mappedBy = "featuredImage")
-    private List<Article> articles;
-
-    @OneToMany(mappedBy = "avatar")
-    private List<Expert> experts;
-
-    @ManyToMany(mappedBy = "media")
-    private List<Plant> plants;
-    */
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import vnua.kltn.herb.dto.LoginDto;
 import vnua.kltn.herb.dto.UserDto;
 import vnua.kltn.herb.dto.UserRegisterDto;
+import vnua.kltn.herb.dto.request.UserRequestDto;
 import vnua.kltn.herb.dto.response.UserResponseDto;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.response.HerbResponse;
@@ -33,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public HerbResponse<UserResponseDto> registerUser(@Valid @RequestBody UserRegisterDto registerDto) throws HerbException {
+    public HerbResponse<UserResponseDto> registerUser(@Valid @RequestBody UserRequestDto registerDto) throws HerbException {
         var createdUser = userService.create(registerDto);
         return new HerbResponse<>(createdUser);
     }

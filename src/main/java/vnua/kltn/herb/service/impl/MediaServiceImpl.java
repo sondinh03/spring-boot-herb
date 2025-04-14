@@ -103,6 +103,4 @@ public class MediaServiceImpl implements MediaService {
         var filePath = Paths.get(uploadDir, media.getFilePath());
         return FileUtils.readFile(filePath.toString()).orElseThrow(() -> new IOException("Khong the doc file" + filePath));
     }
-
-
 }

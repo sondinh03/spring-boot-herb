@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -58,13 +58,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/plants/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/plants/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/plants/**").hasAnyRole("ADMIN", "EDITOR")
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/articles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/experts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/research/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/users/**").permitAll()
+
                         .anyRequest().authenticated()
                 );
 

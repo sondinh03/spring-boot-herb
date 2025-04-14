@@ -1,12 +1,8 @@
 package vnua.kltn.herb.service.impl;
 
-import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,45 +13,36 @@ import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 import vnua.kltn.herb.constant.enums.UserRoleEnum;
 import vnua.kltn.herb.constant.enums.UserStatusEnum;
 import vnua.kltn.herb.dto.LoginDto;
-import vnua.kltn.herb.dto.UserDto;
-import vnua.kltn.herb.dto.UserRegisterDto;
+import vnua.kltn.herb.dto.request.UserRequestDto;
 import vnua.kltn.herb.dto.response.UserResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
-import vnua.kltn.herb.entity.Plant;
-import vnua.kltn.herb.entity.User;
 import vnua.kltn.herb.entity.User;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.UserRepository;
 import vnua.kltn.herb.security.JwtTokenProvider;
+import vnua.kltn.herb.service.BaseSearchService;
 import vnua.kltn.herb.service.UserService;
 import vnua.kltn.herb.service.mapper.UserMapper;
-import vnua.kltn.herb.utils.PageUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static vnua.kltn.herb.constant.enums.ErrorCodeEnum.*;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> implements UserService {
     private final JwtTokenProvider tokenProvider;
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
 
-    /*
     @Override
-    public UserDto getUserById(Long id) {
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new HerbException("User not found with id: " + id));
-        return mapToDto(user);
+    public UserResponseDto getById(Long id) throws HerbException {
+        var user = userRepo.findById(id).orElseThrow(() -> new HerbException(NOT_FOUND));
+        return userMapper.entityToResponse(user);
     }
-    */
 
     @Override
     public UserResponseDto getCurrentUser() throws HerbException {
@@ -99,36 +86,83 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserResponseDto create(UserRegisterDto registerDto) throws HerbException {
-        if (!registerDto.getPassword().equals(registerDto.getPasswordConfirm()))
+    public UserResponseDto create(UserRequestDto requestDto) throws HerbException {
+        if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm()))
             throw new HerbException(CONFIRM_PASSWORD_ERROR);
 
         // Check if username already exists
-        if (userRepo.existsByUsername(registerDto.getUsername())) {
+        if (userRepo.existsByUsername(requestDto.getUsername())) {
             throw new HerbException(EXISTED_USERNAME);
         }
 
         // Check if email already exists
-        if (userRepo.existsByEmail(registerDto.getEmail())) {
+        if (userRepo.existsByEmail(requestDto.getEmail())) {
             throw new HerbException(EXISTED_EMAIL);
         }
 
+        var user = userMapper.requestToEntity(requestDto);
+        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+
+        /*
         // Create new user
         var user = User.builder()
-                .username(registerDto.getUsername())
-                .email(registerDto.getEmail())
-                .password(passwordEncoder.encode(registerDto.getPassword()))
-                .fullName(registerDto.getFullName())
+                .username(requestDto.getUsername())
+                .email(requestDto.getEmail())
+                .password(passwordEncoder.encode(requestDto.getPassword()))
+                .fullName(requestDto.getFullName())
                 .build();
+         */
 
         // Set default role as USER
-        user.setRoleType(UserRoleEnum.USER.getType());
+        if (requestDto.getRoleType() == null)
+            user.setRoleType(UserRoleEnum.USER.getType());
+        else user.setRoleType(requestDto.getRoleType());
 
         // Set status as ACTIVE
-        user.setStatus(UserStatusEnum.ACTIVE.getType());
+        if (requestDto.getStatus() == null)
+            user.setStatus(UserStatusEnum.ACTIVE.getType());
+        else user.setStatus(requestDto.getStatus());
 
         user = userRepo.save(user);
         return userMapper.entityToResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public Boolean update(Long id, UserRequestDto requestDto) throws HerbException {
+        var user = userRepo.findById(id).orElseThrow(() -> new HerbException(NOT_FOUND));
+
+        // Lấy thông tin user hiện tại
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        // Chỉ ADMIN mới có thể cập nhật role và status
+        if (!isAdmin) {
+            // Reset role và status về giá trị hiện tại nếu không phải admin
+            requestDto.setRoleType(user.getRoleType());
+            requestDto.setStatus(user.getStatus());
+        }
+
+        if (requestDto.getEmail() != null && !requestDto.getEmail().equals(user.getEmail())) {
+            Optional<User> existingUserWithEmail = userRepo.findByEmail(requestDto.getEmail());
+            if (existingUserWithEmail.isPresent() && !existingUserWithEmail.get().getId().equals(id)) {
+                throw new HerbException(EXISTED_EMAIL);
+            }
+        }
+
+        userMapper.setValue(requestDto, user);
+
+        // Xử lý cập nhật mật khẩu nếu có
+        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
+            if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm())) {
+                throw new HerbException(CONFIRM_PASSWORD_ERROR);
+            }
+            user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        }
+
+        userRepo.save(user);
+        return true;
     }
 
     @Override
@@ -165,6 +199,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    /*
     public Page<UserResponseDto> search(SearchDto searchDto) {
         Specification<User> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -229,6 +264,13 @@ public class UserServiceImpl implements UserService {
         // Thực hiện truy vấn
         Page<User> users = userRepo.findAll(spec, pageable);
         return users.map(userMapper::entityToResponse);
+    }
+     */
+
+    @Override
+    public Page<UserResponseDto> search(SearchDto searchDto) {
+        List<String> searchableFields = List.of("username", "email", "fullName");
+        return super.search(searchDto, userRepo, userRepo, userMapper::entityToResponse, searchableFields);
     }
 
 

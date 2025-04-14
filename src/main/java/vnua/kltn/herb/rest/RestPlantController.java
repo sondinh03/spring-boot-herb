@@ -22,9 +22,19 @@ public class RestPlantController {
         return new HerbResponse<>(plantService.create(requestDto));
     }
 
+    @GetMapping("/{id}")
+    HerbResponse<PlantResponseDto> getById(@PathVariable(value = "id") Long id) throws HerbException {
+        return new HerbResponse<>(plantService.getById(id));
+    }
+
     @GetMapping(value = "/search")
     HerbResponse<Page<PlantResponseDto>> search(SearchDto dto) {
         return new HerbResponse<>(plantService.search(dto));
+    }
+
+    @PutMapping("/{id}")
+    HerbResponse<Boolean> update(@PathVariable(value = "id") Long id, @RequestBody PlantRequestDto requestDto) throws HerbException {
+        return new HerbResponse<>(plantService.update(id, requestDto));
     }
 
 }

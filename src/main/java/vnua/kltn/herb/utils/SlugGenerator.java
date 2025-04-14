@@ -7,12 +7,12 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Component
-public class SlugGenerator {
+public final class SlugGenerator {
     private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
     private static final Pattern EDGESDHASHES = Pattern.compile("(^-|-$)");
 
-    public String generateSlug(String input) {
+    public static String generateSlug(String input) {
         if (input == null) {
             return "";
         }

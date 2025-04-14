@@ -16,6 +16,7 @@ public enum ErrorCodeEnum {
     EXISTED_EMAIL(400_406, "Địa chỉ email đã được sử dụng"),
     CONFIRM_PASSWORD_ERROR(400_407, "Xác nhận mật khẩu và ật khảu chủa khơớp. "),
     UNAUTHORIZED(401, "Unauthorized"),
+    EXISTED_NAME(400_008, "Tên dược liệu đã tồn tại")
     ;
 
     private final int errorCode;
