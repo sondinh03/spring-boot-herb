@@ -10,8 +10,8 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 public class SearchDto implements Serializable {
-    private Integer pageIndex;
-    private Integer pageSize;
+    private Integer pageIndex = 1;
+    private Integer pageSize = 12;
     private String keyword;
     private String sortField;
     private String sortDirection;

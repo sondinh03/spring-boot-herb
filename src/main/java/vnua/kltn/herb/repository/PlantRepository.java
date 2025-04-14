@@ -2,38 +2,35 @@ package vnua.kltn.herb.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import vnua.kltn.herb.entity.Category;
 import vnua.kltn.herb.entity.Plant;
+import vnua.kltn.herb.entity.Tag;
+
+import java.util.Optional;
 
 @Repository
-public interface PlantRepository extends JpaRepository<Plant, Long> {
-    Plant findByVietnameseName(String name);
+public interface PlantRepository extends JpaRepository<Plant, Long>, JpaSpecificationExecutor<Plant> {
+    Boolean existsByName(String name);
 
-    @Query(value = " FROM Plant p WHERE p.id <> :id AND p.vietnameseName = :name ")
-    Plant findByVietnameseNameAndNotId(String name, Long id);
+    Boolean existsByScientificName(String scientificName);
 
-    /*
-    @Query(value = " FROM Plant p WHERE (:keyword IS NULL OR " +
-            " LOWER(p.vietnameseName) LIKE %:keyword% OR " +
-            " LOWER(p.scientificName) LIKE %:keyword%) ")
-    Page<Plant> search(@Param("keyword") String keyword, Pageable pageable);
+    Page<Plant> findAll(Specification<Plant> spec, Pageable pageable);
 
-     */
+    Optional<Plant> findBySlug(String slug);
 
-    @Query(value = """
-        FROM Plant p 
-        WHERE (:keyword IS NULL OR
-        LOWER(p.vietnameseName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-         LOWER(p.scientificName) LIKE LOWER(CONCAT('%', :keyword, '%')))
-        """)
-    Page<Plant> search(@Param("keyword") String keyword, Pageable pageable);
+    Page<Plant> findByStatus(Integer status, Pageable pageable);
 
+    Page<Plant> findByFeatured(Boolean featured, Pageable pageable);
 
+    @Query("SELECT p FROM Plant p WHERE p.name LIKE %?1% OR p.scientificName LIKE %?1% OR p.description LIKE %?1%")
+    Page<Plant> search(String keyword, Pageable pageable);
 
-    @Query(value = " FROM Plant p WHERE (:keyword IS NULL OR " +
-            " LOWER(p.vietnameseName) LIKE :keyword% )")
-    Page<Plant> findByNameWithFirstLetter(@Param("keyword") String keyword, Pageable pageable);
+//    Page<Plant> findByCategoriesContaining(Category category, Pageable pageable);
+
+//    Page<Plant> findByTagsContaining(Tag tag, Pageable pageable);
 }

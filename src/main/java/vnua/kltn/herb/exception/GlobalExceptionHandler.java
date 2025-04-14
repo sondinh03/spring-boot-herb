@@ -2,9 +2,14 @@ package vnua.kltn.herb.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import vnua.kltn.herb.response.HerbResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,5 +30,22 @@ public class GlobalExceptionHandler {
         // based on the error code if needed
 
         return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<HerbResponse<String>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        // Lấy message lỗi đầu tiên
+        String errorMessage = ex.getBindingResult().getAllErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("Validation error occurred");
+
+        HerbResponse<String> response = new HerbResponse<>(
+                HttpStatus.BAD_REQUEST.value(),
+                errorMessage
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 }

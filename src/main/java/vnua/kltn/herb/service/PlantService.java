@@ -11,11 +11,7 @@ public interface PlantService {
 
     PlantResponseDto getById(Long id) throws HerbException;
 
+    Page<PlantResponseDto> search(SearchDto searchDto);
+
     Boolean update(Long id, PlantRequestDto requestDto) throws HerbException;
-
-    Boolean delete(Long id) throws HerbException;
-
-    Page<PlantResponseDto> search(SearchDto dto);
-
-    Page<PlantResponseDto> findByNameWithFirstLetter(SearchDto dto);
 }
