@@ -1,27 +1,38 @@
 package vnua.kltn.herb.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import vnua.kltn.herb.constant.enums.FileTypeEnum;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MediaResponseDto {
     private Long id;
     private String fileName;
     private String filePath;
-    private String originalName;
-    private String description;
-    private String fileType;
-    private String mimeType;
-    private Long fileSize;
-    private Integer width;
-    private Integer height;
-    private LocalDateTime uploadDate;
-    private String uploadedBy;
+    private String urlFile;
+    private Integer fileType;
+    private String fileTypeName; // Tên loại file (Hình ảnh, Video, Tài liệu)
+    private Integer fileSize;
+    private String fileSizeFormatted; // Kích thước định dạng (KB, MB)
+    private String altText;
+    private LocalDateTime createdAt;
+    private String createdBy;
+
+    public String getFileTypeName() {
+        var type = FileTypeEnum.fromType(fileType);
+        return type != null ? type.getDescription() : "Không xác định";
+    }
+
+    public String getFileSizeFormatted() {
+        if (fileSize == null) return "0 B";
+
+        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(fileSize) / Math.log10(1024));
+
+        return String.format("%.1f %s", fileSize / Math.pow(1024, digitGroups), units[digitGroups]);
+    }
 }

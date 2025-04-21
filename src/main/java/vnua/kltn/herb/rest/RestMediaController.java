@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vnua.kltn.herb.dto.request.MediaRequestDto;
@@ -31,7 +29,7 @@ public class RestMediaController {
 
     @GetMapping("/{id}")
     public HerbResponse<MediaResponseDto> getById(@PathVariable("id") Long id) throws HerbException {
-            return new HerbResponse<>(mediaService.getById(id));
+        return new HerbResponse<>(mediaService.getById(id));
     }
 
     /**
@@ -39,10 +37,14 @@ public class RestMediaController {
      */
     @GetMapping("/view/{id}")
     public HerbResponse<Resource> view(@PathVariable("id") Long id) throws HerbException, IOException {
-        var mediaInfo = mediaService.getById(id);
         var data = mediaService.getData(id);
 
         var resource = new ByteArrayResource(data);
         return new HerbResponse<>(resource);
+    }
+
+    @DeleteMapping("/{id}")
+    public HerbResponse<Boolean> delete(@PathVariable("id") Long id) throws HerbException {
+        return new HerbResponse<>(mediaService.delete(id));
     }
 }

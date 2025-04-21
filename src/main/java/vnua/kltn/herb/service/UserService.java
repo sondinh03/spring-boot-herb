@@ -20,14 +20,11 @@ public interface UserService {
 
     Boolean update(Long id, UserRequestDto requestDto) throws HerbException;
 
-    /*
-    UserDto getUserById(Integer id);
-    UserDto updateUser(Integer id, UserDto userDto);
-    void deleteUser(Integer id);
-
-     */
-
     Map<String, Object> authenticateUser(LoginDto loginDto) throws HerbException;
+
+    Boolean logout(String token);
+
+    Map<String, Object> refreshToken(String refreshToken) throws HerbException;
 
     Page<UserResponseDto> search(SearchDto searchDto);
 }

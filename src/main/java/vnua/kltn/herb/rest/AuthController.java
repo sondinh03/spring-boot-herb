@@ -41,9 +41,18 @@ public class AuthController {
 
     @GetMapping("/profile")
     public HerbResponse<UserResponseDto> getCurrentUser() throws HerbException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        var userDto = userService.getByUsername(currentUsername);
-        return new HerbResponse<>(userDto);
+        return new HerbResponse<>(userService.getCurrentUser());
+    }
+
+    @PostMapping("/logout")
+    public HerbResponse<Boolean> logout(@RequestHeader("Authorization") String tokenHeader) throws HerbException {
+        var token = tokenHeader.substring(7);
+        return new HerbResponse<>(userService.logout(token));
+    }
+
+    @PostMapping("/refresh")
+    public HerbResponse<?> refreshToken(@RequestBody Map<String, String> request) throws HerbException {
+        var refreshToken = request.get("refreshToken");
+        return new HerbResponse<>(userService.refreshToken(refreshToken));
     }
 }

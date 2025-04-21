@@ -1,23 +1,25 @@
 package vnua.kltn.herb.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Entity
 @Table(name = "media")
-@Builder
 public class Media extends BaseEntity {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
     @Column(name = "file_path", nullable = false)
     private String filePath;
+
+    @Column(name = "url_file")
+    private String urlFile;
 
     @Column(name = "file_type", nullable = false)
     private Integer fileType;
@@ -27,7 +29,4 @@ public class Media extends BaseEntity {
 
     @Column(name = "alt_text")
     private String altText;
-
-    @Column(name = "uploaded_by")
-    private Long uploadedBy;
 }

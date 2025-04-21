@@ -12,4 +12,6 @@ public interface MediaService {
     MediaResponseDto getById(Long id) throws HerbException;
 
     byte[] getData(Long id) throws HerbException, IOException;
+
+    Boolean delete(Long id) throws HerbException;
 }
