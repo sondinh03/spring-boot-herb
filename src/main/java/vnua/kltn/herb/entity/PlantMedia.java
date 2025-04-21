@@ -1,8 +1,6 @@
 package vnua.kltn.herb.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +12,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "plant_media")
 @Builder
-public class PlantMedia extends BaseEntity {
-    @Column(name = "plant_id")
-    private Long plantId;
-
-    @Column(name = "media_id")
-    private Long mediaId;
+public class PlantMedia{
+    @EmbeddedId
+    private PlantMediaId id; // Composite key
 
     @Column(name = "is_featured")
     private Boolean isFeatured;

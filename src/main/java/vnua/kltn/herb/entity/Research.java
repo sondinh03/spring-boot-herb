@@ -45,10 +45,6 @@ public class Research extends BaseEntity {
 
     private Integer views = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by")
-    private User createdBy;
-
     @ManyToMany
     @JoinTable(
             name = "research_plants",

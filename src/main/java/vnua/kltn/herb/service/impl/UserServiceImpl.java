@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -66,24 +68,6 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
         return userMapper.entityToResponse(user);
     }
 
-    /*
-
-    @Override
-    public UserDto getUserByEmail(String email) {
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new HerbException("User not found with email: " + email));
-        return mapToDto(user);
-    }
-
-    @Override
-    public List<UserDto> getAllUsers() {
-        List<User> users = userRepo.findAll();
-        return users.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-    }
-    */
-
     @Transactional
     @Override
     public UserResponseDto create(UserRequestDto requestDto) throws HerbException {
@@ -102,16 +86,6 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
 
         var user = userMapper.requestToEntity(requestDto);
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-
-        /*
-        // Create new user
-        var user = User.builder()
-                .username(requestDto.getUsername())
-                .email(requestDto.getEmail())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
-                .fullName(requestDto.getFullName())
-                .build();
-         */
 
         // Set default role as USER
         if (requestDto.getRoleType() == null)
@@ -167,11 +141,6 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
 
     @Override
     public Map<String, Object> authenticateUser(LoginDto loginDto) throws HerbException {
-        // Log toàn bộ thông tin nhận được
-        log.info("Login Request - Username: {}", loginDto.getUsername());
-        log.info("Login Request - Password Length: {}",
-                loginDto.getPassword() != null ? loginDto.getPassword().length() : "null");
-
         // Xác thực người dùng
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -179,203 +148,73 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
                         loginDto.getPassword())
         );
 
-        log.info("Authentication Details: {}", authentication);
-        log.info("Authentication Principal: {}", authentication.getPrincipal());
-        log.info("Authentication Credentials: {}", authentication.getCredentials());
 
         // Đặt context security
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         var token = tokenProvider.generateToken(authentication);
+        var refreshToken = tokenProvider.generateRefreshToken(loginDto.getUsername());
 
         var userDto = getByUsername(loginDto.getUsername());
 
         // Tạo response
         Map<String, Object> response = new HashMap<>();
         response.put("accessToken", token);
+        response.put("refreshToken", refreshToken);
         response.put("tokenType", "Bearer");
         response.put("user", userDto);
 
         return response;
     }
 
-    /*
-    public Page<UserResponseDto> search(SearchDto searchDto) {
-        Specification<User> spec = (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
+    @Override
+    public Boolean logout(String token) {
+        SecurityContextHolder.clearContext();
+        tokenProvider.blacklistToken(token);
+        return true;
+    }
 
-            // Xử lý từ khóa tìm kiếm
-            if (searchDto.getKeyword() != null && !searchDto.getKeyword().isEmpty()) {
-                String keyword = "%" + searchDto.getKeyword().toLowerCase() + "%";
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), keyword),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("scientificName")), keyword),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), keyword)
-                ));
-            }
-
-            // Xử lý các bộ lọc động
-            if (searchDto.getFilters() != null && !searchDto.getFilters().isEmpty()) {
-                for (Map.Entry<String, Object> filter : searchDto.getFilters().entrySet()) {
-                    String key = filter.getKey();
-                    Object value = filter.getValue();
-
-                    // Xử lý các loại filter khác nhau
-                    if (value != null) {
-                        if (value instanceof String) {
-                            predicates.add(criteriaBuilder.like(
-                                    criteriaBuilder.lower(root.get(key)),
-                                    "%" + ((String) value).toLowerCase() + "%"
-                            ));
-                        } else if (value instanceof List) {
-                            // Xử lý filter là danh sách (ví dụ: filter theo nhiều ID)
-                            predicates.add(root.get(key).in((List<?>) value));
-                        } else {
-                            // Xử lý các filter so sánh bằng
-                            predicates.add(criteriaBuilder.equal(root.get(key), value));
-                        }
-                    }
-                }
-            }
-
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-
-        // Xử lý phân trang
-        var pageable = PageUtils.getPageable(
-                searchDto.getPageIndex() != null ? searchDto.getPageIndex() : 0,
-                searchDto.getPageSize() != null ? searchDto.getPageSize() : 10
-        );
-
-        // Xử lý sắp xếp nếu có
-        if (searchDto.getSortField() != null && !searchDto.getSortField().isEmpty()) {
-            Sort.Direction direction = searchDto.getSortDirection() != null &&
-                    searchDto.getSortDirection().equalsIgnoreCase("desc")
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-
-            pageable = PageUtils.getPageable(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    Sort.by(direction, searchDto.getSortField())
-            );
+    @Override
+    public Map<String, Object> refreshToken(String refreshToken) throws HerbException {
+        log.info("refresh token: {}", refreshToken);
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new HerbException(INVALID_TOKEN);
         }
 
-        // Thực hiện truy vấn
-        Page<User> users = userRepo.findAll(spec, pageable);
-        return users.map(userMapper::entityToResponse);
+        if (!tokenProvider.isRefreshToken(refreshToken)) {
+            throw new HerbException(INVALID_TOKEN);
+        }
+
+        var username = tokenProvider.getUsernameFromToken(refreshToken);
+        var user = userRepo.findByUsername(username).orElseThrow(() -> new HerbException(NOT_FOUND));
+
+        List<GrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + UserRoleEnum.getByType(user.getRoleType()))
+        );
+
+        var authentication = new UsernamePasswordAuthenticationToken(
+                username, null, authorities);
+
+        // Tạo token mới
+        String newAccessToken = tokenProvider.generateToken(authentication);
+        String newRefreshToken = tokenProvider.generateRefreshToken(username);
+
+        // Thêm token cũ vào blacklist
+        tokenProvider.blacklistToken(refreshToken);
+
+        // Tạo response
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+        response.put("refreshToken", newRefreshToken);
+        response.put("tokenType", "Bearer");
+        response.put("user", userMapper.entityToResponse(user));
+
+        return response;
     }
-     */
 
     @Override
     public Page<UserResponseDto> search(SearchDto searchDto) {
         List<String> searchableFields = List.of("username", "email", "fullName");
         return super.search(searchDto, userRepo, userRepo, userMapper::entityToResponse, searchableFields);
     }
-
-
-    /*
-    @Override
-    @Transactional
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new HerbException("User not found with id: " + id));
-
-        // Update user fields
-        if (userDto.getFullName() != null) {
-            user.setFullName(userDto.getFullName());
-        }
-
-        // Only admin can update role and status
-        if (userDto.getRoleType() != null) {
-            user.setRoleType(userDto.getRoleType());
-        }
-
-        if (userDto.getStatus() != null) {
-            user.setStatus(userDto.getStatus());
-        }
-
-        // Update email if provided and not already used by another user
-        if (userDto.getEmail() != null && !userDto.getEmail().equals(user.getEmail())) {
-            Optional<User> existingUserWithEmail = userRepo.findByEmail(userDto.getEmail());
-            if (existingUserWithEmail.isPresent() && !existingUserWithEmail.get().getId().equals(id)) {
-                throw new HerbException("Email already in use");
-            }
-            user.setEmail(userDto.getEmail());
-        }
-
-        User updatedUser = userRepo.save(user);
-        return mapToDto(updatedUser);
-    }
-
-
-    @Override
-    @Transactional
-    public void deleteUser(Long id) {
-        User user = userRepo.findById(id)
-                .orElseThrow(() -> new HerbException("User not found with id: " + id));
-        userRepo.delete(user);
-    }
-
-    @Override
-    @Transactional
-    public UserDto changePassword(Long userId, String oldPassword, String newPassword) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new HerbException("User not found with id: " + userId));
-
-        // Verify old password
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new HerbException("Incorrect old password");
-        }
-
-        // Update password
-        user.setPassword(passwordEncoder.encode(newPassword));
-        User updatedUser = userRepo.save(user);
-        return mapToDto(updatedUser);
-    }
-
-    @Override
-    @Transactional
-    public UserDto updateUserRole(Long userId, UserRoleEnum role) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new HerbException("User not found with id: " + userId));
-        user.setRoleType(role);
-        User updatedUser = userRepo.save(user);
-        return mapToDto(updatedUser);
-    }
-
-    @Override
-    @Transactional
-    public UserDto updateUserStatus(Long userId, UserStatusEnum status) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new HerbException("User not found with id: " + userId));
-        user.setStatus(status);
-        User updatedUser = userRepo.save(user);
-        return mapToDto(updatedUser);
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return userRepo.findByUsername(username).isPresent();
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return userRepo.findByEmail(email).isPresent();
-    }
-
-    // Helper method to map User entity to UserDto
-    private UserDto mapToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setFullName(user.getFullName());
-        userDto.setRoleType(user.getRoleType());
-        userDto.setStatus(user.getStatus());
-        userDto.setCreatedAt(user.getCreateDate());
-        return userDto;
-    }
-
-     */
 }

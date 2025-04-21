@@ -13,4 +13,13 @@ public enum UserRoleEnum {
 
     private final Integer type;
     private final String value;
+
+    public static UserRoleEnum getByType(Integer type) {
+        for (UserRoleEnum e : UserRoleEnum.values()) {
+            if (e.type.equals(type)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }

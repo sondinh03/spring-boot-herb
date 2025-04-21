@@ -56,9 +56,12 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/files/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/plants/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/plants/**").hasAnyRole("ADMIN", "EDITOR")
+                                .requestMatchers(HttpMethod.POST, "/api/media/**").hasAnyRole("ADMIN", "EDITOR")
+                                .requestMatchers(HttpMethod.DELETE, "/api/media/**").hasAnyRole("ADMIN", "EDITOR")
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/articles/**").permitAll()
