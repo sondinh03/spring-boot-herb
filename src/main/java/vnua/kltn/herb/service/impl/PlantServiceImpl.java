@@ -29,7 +29,6 @@ import java.util.Map;
 public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto> implements PlantService  {
     private final PlantRepository plantRepo;
     private final PlantMapper plantMapper;
-    private final SlugGenerator slugGenerator;
 
     @Override
     @Transactional

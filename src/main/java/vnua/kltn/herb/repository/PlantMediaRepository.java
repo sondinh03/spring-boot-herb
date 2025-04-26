@@ -18,6 +18,9 @@ public interface PlantMediaRepository extends JpaRepository<PlantMedia, PlantMed
     @Query("SELECT pm.id.mediaId FROM PlantMedia pm WHERE pm.id.plantId = :plantId")
     List<Long> findMediaIdsByPlantId(@Param("plantId") Long plantId);
 
+    @Query("SELECT pm.id.mediaId FROM PlantMedia pm WHERE pm.id.plantId = :plantId AND pm.isFeatured = true ")
+    Long findMediaIdFeaturedByPlantId(@Param("plantId") Long plantId);
+
     @Modifying
     @Query("DELETE FROM PlantMedia pm WHERE pm.id.mediaId = :mediaId")
     void deleteAllById_MediaId(@Param("mediaId") Long mediaId);

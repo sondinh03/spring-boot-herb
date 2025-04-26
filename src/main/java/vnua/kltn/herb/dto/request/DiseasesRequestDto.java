@@ -1,5 +1,6 @@
-package vnua.kltn.herb.dto.response;
+package vnua.kltn.herb.dto.request;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,9 @@ import vnua.kltn.herb.dto.BaseObjectDto;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiseaseGroupResponseDto extends BaseObjectDto {
-    private Long id;
+public class DiseasesRequestDto extends BaseObjectDto {
     private String name;
-    private String description;
     private String slug;
-    private Integer displayOrder;
-    private Boolean isActive;
+    private String description;
+    private Long parentId;
 }

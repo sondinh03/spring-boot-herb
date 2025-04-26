@@ -36,4 +36,9 @@ public class PlantMediaServiceImpl implements PlantMediaService {
     public List<Long> findMediaIdsByPlantId(Long id) {
         return plantMediaRepo.findMediaIdsByPlantId(id);
     }
+
+    @Override
+    public Long findMediaIdFeaturedByPlantId(Long id) {
+        return plantMediaRepo.findMediaIdFeaturedByPlantId(id);
+    }
 }

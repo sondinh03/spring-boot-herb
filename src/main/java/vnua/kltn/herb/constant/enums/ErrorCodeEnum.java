@@ -6,20 +6,31 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCodeEnum {
+    // Successful response
     SUCCESS(200, "Success"),
-    NOT_FOUND(404, "Not Found"),
-    PLAN_FAMILY_EXIST(400_001, "Họ thực vật đã tồn tại."),
-    PLAN_IS_EXIST(400_002, "Cây dược liệu đã có trong cơ sở dữ liệu."),
-    FILE_NOT_EMPTY(400_003, "File không được trống."),
-    FILE_UPLOAD_ERROR(400_004, "File không thể lưu."),
-    EXISTED_USERNAME(400_005, "Tên đăng nhập đã tồn tại"),
-    EXISTED_EMAIL(400_406, "Địa chỉ email đã được sử dụng"),
-    CONFIRM_PASSWORD_ERROR(400_407, "Xác nhận mật khẩu và ật khảu chủa khơớp. "),
+
+    // Standard HTTP errors
     UNAUTHORIZED(401, "Unauthorized"),
-    EXISTED_NAME(400_008, "Tên dược liệu đã tồn tại"),
-    INVALID_TOKEN(401_002, "Token ko hop le"),
-    NOT_SUPPORT(401_005, "Định dạng file không được hỗ trợ"),
-    ;
+    NOT_FOUND(404, "Not Found"),
+
+    // Authentication/Authorization errors (401xxx)
+    INVALID_TOKEN(401001, "Token không hợp lệ"),
+
+    // Bad Request errors (400xxx)
+    // -- User management errors (400100-400199)
+    EXISTED_USERNAME(400101, "Tên đăng nhập đã tồn tại"),
+    EXISTED_EMAIL(400102, "Địa chỉ email đã được sử dụng"),
+    CONFIRM_PASSWORD_ERROR(400103, "Xác nhận mật khẩu và mật khẩu chưa khớp"),
+
+    // -- Plant management errors (400200-400299)
+    PLANT_FAMILY_EXIST(400201, "Họ thực vật đã tồn tại"),
+    PLANT_IS_EXIST(400202, "Cây dược liệu đã có trong cơ sở dữ liệu"),
+    EXISTED_NAME(400203, "Tên dược liệu đã tồn tại"),
+
+    // -- File management errors (400300-400399)
+    FILE_NOT_EMPTY(400301, "File không được trống"),
+    FILE_UPLOAD_ERROR(400302, "File không thể lưu"),
+    NOT_SUPPORT(400303, "Định dạng file không được hỗ trợ");
 
     private final int errorCode;
     private final String message;

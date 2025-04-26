@@ -45,4 +45,9 @@ public class RestPlantController {
     public HerbResponse<List<Long>> getMediaIds(@PathVariable(value = "plantId") Long plantId) {
         return new HerbResponse<>(plantMediaService.findMediaIdsByPlantId(plantId));
     }
+
+    @GetMapping("/{plantId}/media-featured")
+    public HerbResponse<Long> getMediaIdFeatured(@PathVariable(value = "plantId") Long plantId) {
+        return new HerbResponse<>(plantMediaService.findMediaIdFeaturedByPlantId(plantId));
+    }
 }

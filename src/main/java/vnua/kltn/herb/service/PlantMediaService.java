@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface PlantMediaService {
     List<Long> findMediaIdsByPlantId(Long id);
+
+    Long findMediaIdFeaturedByPlantId(Long id);
 }

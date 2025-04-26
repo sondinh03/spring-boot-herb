@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import vnua.kltn.herb.entity.Category;
 import vnua.kltn.herb.entity.Plant;
-import vnua.kltn.herb.entity.Tag;
 
 import java.util.Optional;
 
