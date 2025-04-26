@@ -19,7 +19,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Page<Article> findByAuthor(User author, Pageable pageable);
 
-    Page<Article> findByCategory(Category category, Pageable pageable);
+    Page<Article> findByCategory(Diseases category, Pageable pageable);
 
 //    Page<Article> findByPlantsContaining(Plant plant, Pageable pageable);
 

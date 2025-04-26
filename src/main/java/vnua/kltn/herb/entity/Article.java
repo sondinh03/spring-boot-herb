@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -48,7 +46,7 @@ public class Article extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category;
+    private Diseases category;
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;

@@ -141,10 +141,20 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
 
     @Override
     public Map<String, Object> authenticateUser(LoginDto loginDto) throws HerbException {
+        var usernameOrEmail = loginDto.getUsername();
+        String actualUsername;
+
+        if (usernameOrEmail.contains("@")) {
+            var user = userRepo.findByEmail(usernameOrEmail).orElseThrow(() -> new HerbException(NOT_FOUND));
+            actualUsername = user.getUsername();
+        } else {
+            actualUsername = usernameOrEmail;
+        }
+
         // Xác thực người dùng
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDto.getUsername(),
+                        actualUsername,
                         loginDto.getPassword())
         );
 
@@ -153,9 +163,9 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         var token = tokenProvider.generateToken(authentication);
-        var refreshToken = tokenProvider.generateRefreshToken(loginDto.getUsername());
+        var refreshToken = tokenProvider.generateRefreshToken(actualUsername);
 
-        var userDto = getByUsername(loginDto.getUsername());
+        var userDto = getByUsername(actualUsername);
 
         // Tạo response
         Map<String, Object> response = new HashMap<>();
