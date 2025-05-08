@@ -38,6 +38,7 @@ public class PlantRequestDto {
     private String dosage;
     private String folkRemedies;
     private String sideEffects;
+    private Long diseasesId;
     private Integer status;
     private Boolean featured;
     private Integer views;

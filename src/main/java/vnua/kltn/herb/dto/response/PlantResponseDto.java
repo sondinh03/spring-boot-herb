@@ -3,6 +3,7 @@ package vnua.kltn.herb.dto.response;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import vnua.kltn.herb.dto.CategoryDto;
 import vnua.kltn.herb.dto.MediaDto;
@@ -10,10 +11,11 @@ import vnua.kltn.herb.dto.TagDto;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlantResponseDto {
+public class PlantResponseDto extends BaseResponseDto {
     private Long id;
     private String name;
     private String scientificName;
@@ -35,14 +37,11 @@ public class PlantResponseDto {
     private String dosage;
     private String folkRemedies;
     private String sideEffects;
+    private Long diseaseId;
     private Integer status;
     private Boolean featured;
     private Integer views;
-
-    private Integer createdById;
-    private String createdByUsername;
-    private String createdAt;
-    private String updatedAt;
+    private Long featuredMediaId;
 
     private List<CategoryDto> categories;
     private List<TagDto> tags;

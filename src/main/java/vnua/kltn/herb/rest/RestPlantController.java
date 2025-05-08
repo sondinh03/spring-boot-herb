@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
+import vnua.kltn.herb.dto.response.MediaResponseDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.exception.HerbException;
@@ -44,6 +45,11 @@ public class RestPlantController {
     @GetMapping("/{plantId}/media-ids")
     public HerbResponse<List<Long>> getMediaIds(@PathVariable(value = "plantId") Long plantId) {
         return new HerbResponse<>(plantMediaService.findMediaIdsByPlantId(plantId));
+    }
+
+    @GetMapping("/{plantId}/medias")
+    public HerbResponse<List<MediaResponseDto>> getMedias(@PathVariable(value = "plantId") Long plantId) throws HerbException {
+        return new HerbResponse<>(plantMediaService.findMediaByPlantId(plantId));
     }
 
     @GetMapping("/{plantId}/media-featured")

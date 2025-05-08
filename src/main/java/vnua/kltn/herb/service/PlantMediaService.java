@@ -10,5 +10,7 @@ import java.util.List;
 public interface PlantMediaService {
     List<Long> findMediaIdsByPlantId(Long id);
 
+    List<MediaResponseDto> findMediaByPlantId(Long id) throws HerbException;
+
     Long findMediaIdFeaturedByPlantId(Long id);
 }
