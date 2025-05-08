@@ -84,19 +84,12 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
             throw new HerbException(EXISTED_EMAIL);
         }
 
+        if (Objects.equals(requestDto.getRoleType(), UserRoleEnum.USER.getType()))
+            requestDto.setStatus(UserStatusEnum.ACTIVE.getType());
+        else requestDto.setStatus(UserStatusEnum.PENDING.getType());
+
         var user = userMapper.requestToEntity(requestDto);
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-
-        // Set default role as USER
-        if (requestDto.getRoleType() == null)
-            user.setRoleType(UserRoleEnum.USER.getType());
-        else user.setRoleType(requestDto.getRoleType());
-
-        // Set status as ACTIVE
-        if (requestDto.getStatus() == null)
-            user.setStatus(UserStatusEnum.ACTIVE.getType());
-        else user.setStatus(requestDto.getStatus());
-
         user = userRepo.save(user);
         return userMapper.entityToResponse(user);
     }

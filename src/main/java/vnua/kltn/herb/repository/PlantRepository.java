@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import vnua.kltn.herb.dto.response.PlantWithMedia;
 import vnua.kltn.herb.entity.Plant;
 
 import java.util.Optional;
@@ -28,7 +29,6 @@ public interface PlantRepository extends JpaRepository<Plant, Long>, JpaSpecific
     @Query("SELECT p FROM Plant p WHERE p.name LIKE %?1% OR p.scientificName LIKE %?1% OR p.description LIKE %?1%")
     Page<Plant> search(String keyword, Pageable pageable);
 
-//    Page<Plant> findByCategoriesContaining(Category category, Pageable pageable);
-
-//    Page<Plant> findByTagsContaining(Tag tag, Pageable pageable);
+    @Query(" SELECT p as plant, pm as media FROM Plant p LEFT JOIN PlantMedia pm ON pm.id.plantId = p.id AND pm.isFeatured = true ")
+    Page<PlantWithMedia> searchWithFeaturedMedia(Specification<Plant> spec, Pageable pageable);
 }

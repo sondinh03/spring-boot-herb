@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum UserRoleEnum {
     ADMIN(1, "Quản trị viên hệ thống"),
     EDITOR(2, "Biên tập viên"),
-    USER(3, "Người dùng thông thường"),
+    EPXERT(3, "Chuyên gia dược liệu"),
+    USER(4, "Người dùng thông thường"),
     ;
 
     private final Integer type;

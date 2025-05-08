@@ -3,6 +3,7 @@ package vnua.kltn.herb.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -75,13 +77,15 @@ public class Plant extends BaseEntity {
     @Column(name = "side_effects", columnDefinition = "TEXT")
     private String sideEffects;
 
+    @Column(name = "diseases_id")
+    private Long diseaseId;
+
     @Column(nullable = false)
     private Integer status = 1; // Default: DRAFT
 
     private Boolean featured = false;
 
     private Integer views = 0;
-
     /*
     @ManyToOne
     @JoinColumn(name = "created_by")

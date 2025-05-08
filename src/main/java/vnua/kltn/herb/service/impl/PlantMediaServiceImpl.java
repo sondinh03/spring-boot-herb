@@ -13,6 +13,7 @@ import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.MediaRepository;
 import vnua.kltn.herb.repository.PlantMediaRepository;
+import vnua.kltn.herb.repository.PlantRepository;
 import vnua.kltn.herb.repository.UserRepository;
 import vnua.kltn.herb.service.MediaService;
 import vnua.kltn.herb.service.PlantMediaService;
@@ -31,10 +32,20 @@ import static vnua.kltn.herb.constant.enums.FileTypeEnum.*;
 @RequiredArgsConstructor
 public class PlantMediaServiceImpl implements PlantMediaService {
     private final PlantMediaRepository plantMediaRepo;
+    private final PlantRepository plantaRepo;
+    private final MediaMapper mediaMapper;
 
     @Override
     public List<Long> findMediaIdsByPlantId(Long id) {
         return plantMediaRepo.findMediaIdsByPlantId(id);
+    }
+
+    @Override
+    public List<MediaResponseDto> findMediaByPlantId(Long plantId) throws HerbException {
+        if (!plantaRepo.existsById(plantId)) {
+            throw new HerbException(ErrorCodeEnum.NOT_FOUND);
+        }
+        return plantMediaRepo.findMediaById_PlantId(plantId).stream().map(mediaMapper::entityToResponse).toList();
     }
 
     @Override

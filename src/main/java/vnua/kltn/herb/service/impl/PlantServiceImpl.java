@@ -1,10 +1,7 @@
 package vnua.kltn.herb.service.impl;
 
-import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
@@ -12,23 +9,25 @@ import vnua.kltn.herb.dto.request.PlantRequestDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.entity.Plant;
+import vnua.kltn.herb.entity.PlantMedia;
 import vnua.kltn.herb.exception.HerbException;
+import vnua.kltn.herb.repository.PlantMediaRepository;
 import vnua.kltn.herb.repository.PlantRepository;
 import vnua.kltn.herb.service.BaseSearchService;
 import vnua.kltn.herb.service.PlantService;
 import vnua.kltn.herb.service.mapper.PlantMapper;
-import vnua.kltn.herb.utils.PageUtils;
 import vnua.kltn.herb.utils.SlugGenerator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto> implements PlantService  {
     private final PlantRepository plantRepo;
     private final PlantMapper plantMapper;
+    private final PlantMediaRepository plantMediaRepo;
 
     @Override
     @Transactional
@@ -120,8 +119,26 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
 
      */
     public Page<PlantResponseDto> search(SearchDto searchDto) {
-        List<String> searchableFields = List.of("name", "scientificName", "description");
-        return super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
+        List<String> searchableFields = List.of("name", "scientificName", "description", "diseaseId");
+        var plants = super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
+
+        List<Long> plantIds = plants.getContent().stream().map(PlantResponseDto::getId).toList();
+
+        var featuredMedias = plantMediaRepo.findByIdPlantIdInAndIsFeaturedTrue(plantIds);
+        Map<Long, PlantMedia> mediaMap = featuredMedias.stream()
+                .collect(Collectors.toMap(
+                        pm -> pm.getId().getPlantId(),
+                        pm -> pm,
+                        (pm1, pm2) -> pm1 // Giữ bản ghi đầu tiên nếu trùng
+                ));
+
+        return plants.map(plant -> {
+            var media = mediaMap.get(plant.getId());
+            if (media != null) {
+                plant.setFeaturedMediaId(media.getId().getMediaId());
+            }
+            return plant;
+        });
     }
 
     @Override
