@@ -49,77 +49,8 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
         return plantMapper.entityToResponse(plantEntity);
     }
 
-    /*
-    @Override
     public Page<PlantResponseDto> search(SearchDto searchDto) {
-        Specification<Plant> spec = (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            // Xử lý từ khóa tìm kiếm
-            if (searchDto.getKeyword() != null && !searchDto.getKeyword().isEmpty()) {
-                String keyword = "%" + searchDto.getKeyword().toLowerCase() + "%";
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), keyword),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("scientificName")), keyword),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), keyword)
-                ));
-            }
-
-            // Xử lý các bộ lọc động
-            if (searchDto.getFilters() != null && !searchDto.getFilters().isEmpty()) {
-                for (Map.Entry<String, Object> filter : searchDto.getFilters().entrySet()) {
-                    String key = filter.getKey();
-                    Object value = filter.getValue();
-
-                    // Xử lý các loại filter khác nhau
-                    if (value != null) {
-                        if (value instanceof String) {
-                            predicates.add(criteriaBuilder.like(
-                                    criteriaBuilder.lower(root.get(key)),
-                                    "%" + ((String) value).toLowerCase() + "%"
-                            ));
-                        } else if (value instanceof List) {
-                            // Xử lý filter là danh sách (ví dụ: filter theo nhiều ID)
-                            predicates.add(root.get(key).in((List<?>) value));
-                        } else {
-                            // Xử lý các filter so sánh bằng
-                            predicates.add(criteriaBuilder.equal(root.get(key), value));
-                        }
-                    }
-                }
-            }
-
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-
-        // Xử lý phân trang
-        var pageable = PageUtils.getPageable(
-                searchDto.getPageIndex() != null ? searchDto.getPageIndex() : 0,
-                searchDto.getPageSize() != null ? searchDto.getPageSize() : 10
-        );
-
-        // Xử lý sắp xếp nếu có
-        if (searchDto.getSortField() != null && !searchDto.getSortField().isEmpty()) {
-            Sort.Direction direction = searchDto.getSortDirection() != null &&
-                    searchDto.getSortDirection().equalsIgnoreCase("desc")
-                    ? Sort.Direction.DESC
-                    : Sort.Direction.ASC;
-
-            pageable = PageUtils.getPageable(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    Sort.by(direction, searchDto.getSortField())
-            );
-        }
-
-        // Thực hiện truy vấn
-        Page<Plant> plants = plantRepo.findAll(spec, pageable);
-        return plants.map(plantMapper::entityToResponse);
-    }
-
-     */
-    public Page<PlantResponseDto> search(SearchDto searchDto) {
-        List<String> searchableFields = List.of("name", "scientificName", "description", "diseaseId");
+        List<String> searchableFields = List.of("id", "name", "scientificName", "description", "diseaseId", "familyId", "generaId", "chemicalComposition");
         var plants = super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
 
         List<Long> plantIds = plants.getContent().stream().map(PlantResponseDto::getId).toList();

@@ -178,6 +178,14 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
     }
 
     @Override
+    public Boolean validateToken(String token) throws HerbException {
+        if (!tokenProvider.validateToken(token)) {
+            throw new HerbException(INVALID_TOKEN);
+        }
+        return true;
+    }
+
+    @Override
     public Map<String, Object> refreshToken(String refreshToken) throws HerbException {
         log.info("refresh token: {}", refreshToken);
         if (!tokenProvider.validateToken(refreshToken)) {

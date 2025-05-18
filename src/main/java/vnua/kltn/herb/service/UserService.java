@@ -24,6 +24,8 @@ public interface UserService {
 
     Boolean logout(String token);
 
+    Boolean validateToken(String token) throws HerbException;
+
     Map<String, Object> refreshToken(String refreshToken) throws HerbException;
 
     Page<UserResponseDto> search(SearchDto searchDto);

@@ -1,5 +1,6 @@
 package vnua.kltn.herb.dto.response;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,4 +47,6 @@ public class PlantResponseDto extends BaseResponseDto {
     private List<CategoryDto> categories;
     private List<TagDto> tags;
     private List<MediaDto> media;
+    private Long familyId;
+    private Long generaId;
 }

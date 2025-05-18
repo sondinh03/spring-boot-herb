@@ -50,6 +50,12 @@ public class AuthController {
         return new HerbResponse<>(userService.logout(token));
     }
 
+    @PostMapping("/verify-token")
+    public HerbResponse<Boolean> verifyToken(@RequestHeader("Authorization") String tokenHeader) throws HerbException {
+        var token = tokenHeader.substring(7);
+        return new HerbResponse<>(userService.validateToken(token));
+    }
+
     @PostMapping("/refresh")
     public HerbResponse<?> refreshToken(@RequestBody Map<String, String> request) throws HerbException {
         var refreshToken = request.get("refreshToken");

@@ -23,6 +23,8 @@ public class PlantRequestDto {
     private String slug;
     private String family;
     private String genus;
+    private Long familyId;
+    private Long generaId;
     private String otherNames;
     private String partsUsed;
     private String description;
@@ -38,7 +40,7 @@ public class PlantRequestDto {
     private String dosage;
     private String folkRemedies;
     private String sideEffects;
-    private Long diseasesId;
+    private Long diseaseId;
     private Integer status;
     private Boolean featured;
     private Integer views;

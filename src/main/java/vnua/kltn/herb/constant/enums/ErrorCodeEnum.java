@@ -25,7 +25,7 @@ public enum ErrorCodeEnum {
     // -- Plant management errors (400200-400299)
     PLANT_FAMILY_EXIST(400201, "Họ thực vật đã tồn tại"),
     PLANT_IS_EXIST(400202, "Cây dược liệu đã có trong cơ sở dữ liệu"),
-    EXISTED_NAME(400203, "Tên dược liệu đã tồn tại"),
+    EXISTED_NAME(400203, "Tên đã tồn tại"),
 
     // -- File management errors (400300-400399)
     FILE_NOT_EMPTY(400301, "File không được trống"),

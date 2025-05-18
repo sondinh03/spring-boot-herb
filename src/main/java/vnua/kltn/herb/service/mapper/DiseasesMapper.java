@@ -12,5 +12,5 @@ public interface DiseasesMapper {
 
     Diseases requestToEntity(DiseasesRequestDto DiseasesRequestDto);
 
-    void setValue(DiseasesRequestDto requestDto,@MappingTarget Diseases Diseases);
+    void setValue(DiseasesRequestDto requestDto, @MappingTarget Diseases Diseases);
 }
