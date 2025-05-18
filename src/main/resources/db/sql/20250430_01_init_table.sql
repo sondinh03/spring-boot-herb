@@ -1,10 +1,9 @@
 -- Tạo cơ sở dữ liệu
 -- CREATE DATABASE IF NOT EXISTS herbal_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- USE herbal_db;
-
+--
 -- Tạo bảng users
 -- status: 1 = ACTIVE, 2 = INACTIVE, 3 = BANNED, 4 = PENDING, 5 = DELETED
-DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -23,7 +22,6 @@ CREATE TABLE users
 );
 
 -- Tạo bảng diseases
-DROP TABLE IF EXISTS diseases;
 CREATE TABLE diseases
 (
     id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,7 +40,6 @@ CREATE TABLE diseases
 
 -- Tạo bảng media
 -- file_type: 1 = image, 2 = video, 3 = document
-DROP TABLE IF EXISTS media;
 CREATE TABLE media
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +56,6 @@ CREATE TABLE media
 );
 
 -- Tạo bảng tags
-DROP TABLE IF EXISTS tags;
 CREATE TABLE tags
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -74,7 +70,6 @@ CREATE TABLE tags
 
 -- Tạo bảng plants
 -- status: 1 = DRAFT, 2 = PENDING_REVIEW, 3 = PUBLISHED, 4 = ARCHIVED
-DROP TABLE IF EXISTS plants;
 CREATE TABLE plants
 (
     id                        INT AUTO_INCREMENT PRIMARY KEY,
@@ -111,7 +106,6 @@ CREATE TABLE plants
 );
 
 -- Tạo bảng plant_media
-DROP TABLE IF EXISTS plant_media;
 CREATE TABLE plant_media
 (
     plant_id    INT     NOT NULL,
@@ -125,7 +119,6 @@ CREATE TABLE plant_media
 );
 
 -- Tạo bảng plant_tags
-DROP TABLE IF EXISTS plant_tags;
 CREATE TABLE plant_tags
 (
     plant_id INT NOT NULL,
@@ -139,7 +132,6 @@ CREATE TABLE plant_tags
 
 -- Tạo bảng articles
 -- status: 1 = DRAFT, 2 = PENDING_REVIEW, 3 = PUBLISHED, 4 = ARCHIVED
-DROP TABLE IF EXISTS articles;
 CREATE TABLE articles
 (
     id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -169,7 +161,6 @@ CREATE TABLE articles
 );
 
 -- Tạo bảng article_tags
-DROP TABLE IF EXISTS article_tags;
 CREATE TABLE article_tags
 (
     article_id INT NOT NULL,
@@ -182,7 +173,6 @@ CREATE TABLE article_tags
 );
 
 -- Tạo bảng article_plants
-DROP TABLE IF EXISTS article_plants;
 CREATE TABLE article_plants
 (
     article_id INT NOT NULL,
@@ -196,7 +186,6 @@ CREATE TABLE article_plants
 
 -- Tạo bảng experts
 -- status: 1 = ACTIVE, 2 = INACTIVE, 3 = PENDING_APPROVAL, 4 = SUSPENDED
-DROP TABLE IF EXISTS experts;
 CREATE TABLE experts
 (
     id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -221,7 +210,6 @@ CREATE TABLE experts
 );
 
 -- Tạo bảng expert_plants
-DROP TABLE IF EXISTS expert_plants;
 CREATE TABLE expert_plants
 (
     expert_id INT NOT NULL,
@@ -235,7 +223,6 @@ CREATE TABLE expert_plants
 
 -- Tạo bảng research
 -- status: 1 = DRAFT, 2 = UNDER_REVIEW, 3 = PUBLISHED, 4 = ARCHIVED
-DROP TABLE IF EXISTS research;
 CREATE TABLE research
 (
     id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -258,7 +245,6 @@ CREATE TABLE research
 );
 
 -- Tạo bảng research_plants
-DROP TABLE IF EXISTS research_plants;
 CREATE TABLE research_plants
 (
     research_id INT NOT NULL,
@@ -271,7 +257,6 @@ CREATE TABLE research_plants
 );
 
 -- Tạo bảng research_tags
-DROP TABLE IF EXISTS research_tags;
 CREATE TABLE research_tags
 (
     research_id INT NOT NULL,
@@ -285,7 +270,6 @@ CREATE TABLE research_tags
 
 -- Tạo bảng comments
 -- status: 1 = PENDING, 2 = APPROVED, 3 = SPAM, 4 = TRASH
-DROP TABLE IF EXISTS comments;
 CREATE TABLE comments
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,

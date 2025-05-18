@@ -3,23 +3,15 @@ package vnua.kltn.herb.rest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vnua.kltn.herb.dto.request.MediaRequestDto;
 import vnua.kltn.herb.dto.request.DiseasesRequestDto;
-import vnua.kltn.herb.dto.response.DiseasesResponseDto;
-import vnua.kltn.herb.dto.response.MediaResponseDto;
 import vnua.kltn.herb.dto.response.DiseasesResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.response.HerbResponse;
 import vnua.kltn.herb.service.DiseasesService;
-import vnua.kltn.herb.service.MediaService;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController

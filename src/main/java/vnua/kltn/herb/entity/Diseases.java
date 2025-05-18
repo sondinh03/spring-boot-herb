@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vnua.kltn.herb.utils.SlugGenerator;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,10 @@ public class Diseases extends BaseEntity {
 
     @Column(name = "parent_id")
     private Long parentId;
+
+    public void setSlug(String slug) {
+        if (slug == null || slug.isEmpty()) {
+            this.slug = SlugGenerator.generateSlug(this.name);
+        }
+    }
 }

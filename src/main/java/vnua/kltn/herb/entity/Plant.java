@@ -29,9 +29,17 @@ public class Plant extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String slug;
 
+    @Column(name = "family")
     private String family;
 
+    @Column(name = "family_id")
+    private Long familyId;
+
+    @Column(name = "genus")
     private String genus;
+
+    @Column(name = "genera_id")
+    private Long generaId;
 
     @Column(name = "other_names")
     private String otherNames;

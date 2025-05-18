@@ -6,4 +6,10 @@
     <changeSet id="20250430_01_init_table" author="SonDC">
         <sqlFile path="db/sql/20250430_01_init_table.sql"/>
     </changeSet>
+    <changeSet id="20250510_02_add_table_families" author="SonDC">
+        <sqlFile path="db/sql/20250510_02_add_table_families.sql"/>
+    </changeSet>
+    <changeSet id="20250510_03_alt_table_plants" author="SonDC">
+        <sqlFile path="db/sql/20250510_03_alt_table_plants.sql"/>
+    </changeSet>
 </databaseChangeLog>
