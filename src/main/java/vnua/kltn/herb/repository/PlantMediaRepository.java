@@ -17,6 +17,8 @@ import java.util.List;
 public interface PlantMediaRepository extends JpaRepository<PlantMedia, PlantMediaId> {
     Long countById_PlantId(Long id);
 
+    Boolean existsById_PlantId(Long id);
+
     @Query("SELECT pm.id.mediaId FROM PlantMedia pm WHERE pm.id.plantId = :plantId")
     List<Long> findMediaIdsByPlantId(@Param("plantId") Long plantId);
 

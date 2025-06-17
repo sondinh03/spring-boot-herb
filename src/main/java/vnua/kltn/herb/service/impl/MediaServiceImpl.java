@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 import vnua.kltn.herb.dto.request.MediaRequestDto;
 import vnua.kltn.herb.dto.response.MediaResponseDto;
 import vnua.kltn.herb.entity.Media;
-import vnua.kltn.herb.entity.PlantMedia;
-import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.MediaRepository;
 import vnua.kltn.herb.repository.PlantMediaRepository;
@@ -21,10 +20,11 @@ import vnua.kltn.herb.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,20 +45,22 @@ public class MediaServiceImpl implements MediaService {
     @Value("${file.base-url}")
     private String baseFileUrl;
 
+    /*
     @Override
     @Transactional
     public MediaResponseDto upload(MediaRequestDto requestDto) throws HerbException, IOException {
-        // Lấy thông tin người dùng
         var currentUser = userService.getCurrentUser();
-
         var file = requestDto.getFile();
+
+        // Kiểm tra file hợp lệ
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File ko duoc de trong");
+            throw new HerbException(ErrorCodeEnum.EMPTY_FILE);
         }
 
         // Kiểm tra định dạng file hợp lệ
         var originalFilename = file.getOriginalFilename();
-        var fileExtension = FileUtils.getFileExtension(originalFilename).orElse("bin");
+        var fileExtension = FileUtils.getFileExtension(originalFilename)
+                .orElseThrow(() -> new HerbException(ErrorCodeEnum.INVALID_FILE));
 
         // Danh sách định dạng được phép (có thể điều chỉnh theo yêu cầu)
         Set<String> allowedExtensions = new HashSet<>(Arrays.asList(
@@ -116,18 +118,101 @@ public class MediaServiceImpl implements MediaService {
                 .build();
 
         mediaRepo.save(media);
-
-        // Kiểm tra xem đây có phải file đầu tiên của plant không
-        boolean isFirstFile = plantMediaRepo.countById_PlantId(requestDto.getPlantId()) == 0;
-        boolean isFeatured = requestDto.getIsFeatured() != null ? requestDto.getIsFeatured() : isFirstFile;
-
-        var plantMedia = PlantMedia.builder()
-                .id(new PlantMediaId(requestDto.getPlantId(), media.getId()))
-                .isFeatured(isFeatured)
-                .build();
-        plantMediaRepo.save(plantMedia);
-
         return mediaMapper.entityToResponse(media);
+    }
+    */
+
+    @Override
+    @Transactional
+    public MediaResponseDto upload(MediaRequestDto requestDto) throws HerbException, IOException {
+        var currentUser = userService.getCurrentUser();
+        var file = requestDto.getFile();
+
+        // Kiểm tra file hợp lệ
+        validateFile(file);
+
+        // Kiểm tra định dạng file hợp lệ
+        var originalFilename = file.getOriginalFilename();
+        var fileExtension = FileUtils.getFileExtension(originalFilename)
+                .orElseThrow(() -> new HerbException(ErrorCodeEnum.INVALID_FILE));
+        validateFileExtension(fileExtension);
+        validateFileSize(file);
+
+        // Tạo đường dẫn lưu file
+        var yearMonth = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM"));
+        var newFileName = UUID.randomUUID() + "." + fileExtension;
+        var relativePath = Paths.get(yearMonth, newFileName).toString().replace("\\", "/");
+        var fullPath = Paths.get(uploadDir, yearMonth, newFileName).toString();
+
+        // Tạo thư mục
+        FileUtils.createDirectoryIfNotExists(Paths.get(uploadDir, yearMonth).toString());
+
+        // Lưu file
+        Path savedFilePath = Paths.get(fullPath);
+        FileUtils.saveFile(fullPath, file);
+
+        // Xác định loại file
+        var fileType = determineFileType(file, requestDto.getFileType());
+
+        // Tạo URL truy cập file
+        String fileUrl = baseFileUrl + "/" + relativePath;
+
+        // Lưu Media
+        try {
+            var media = Media.builder()
+                    .fileName(originalFilename) // Lưu tên gốc của file
+                    .filePath(relativePath)
+                    .urlFile(fileUrl) // Thêm URL file
+                    .fileType(fileType)
+                    .fileSize((int) file.getSize())
+                    .altText(requestDto.getAltText())
+                    .createdBy(currentUser.getUsername())
+                    .build();
+            mediaRepo.save(media);
+            return mediaMapper.entityToResponse(media);
+        } catch (Exception e) {
+            // Xóa file nếu lưu database thất bại
+            Files.deleteIfExists(savedFilePath);
+            throw new HerbException(ErrorCodeEnum.FILE_DATABASE_ERROR, e);
+        }
+    }
+
+    private Integer determineFileType(MultipartFile file, Integer providedType) {
+        if (providedType != null) {
+            return providedType;
+        }
+
+        var contentType = file.getContentType();
+        if (contentType != null) {
+            if (contentType.startsWith("image/")) {
+                return IMAGE.getType();
+            } else if (contentType.startsWith("video/")) {
+                return VIDEO.getType();
+            }
+        }
+        return DOCUMENT.getType();
+    }
+
+    // Helper methods
+    private void validateFile(MultipartFile file) throws HerbException {
+        if (file == null || file.isEmpty()) {
+            throw new HerbException(ErrorCodeEnum.EMPTY_FILE);
+        }
+    }
+
+    private void validateFileExtension(String fileExtension) throws HerbException {
+        var allowedExtensions = Set.of("jpg", "jpeg", "png", "gif", "pdf", "doc", "docx", "xls", "xlsx", "mp4", "mp3");
+        if (!allowedExtensions.contains(fileExtension.toLowerCase())) {
+            throw new HerbException(ErrorCodeEnum.UNSUPPORTED_FILE_FORMAT);
+        }
+    }
+
+    private void validateFileSize(MultipartFile file) throws HerbException {
+        // Add file size validation (e.g., max 10MB)
+        long maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.getSize() > maxSize) {
+            throw new HerbException(ErrorCodeEnum.FILE_TOO_LARGE, "File quá lớn, tối đa 10MB");
+        }
     }
 
     @Override
@@ -135,7 +220,6 @@ public class MediaServiceImpl implements MediaService {
         var media = mediaRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
         return mediaMapper.entityToResponse(media);
     }
-
 
     @Override
     public byte[] getData(Long id) throws HerbException, IOException {
@@ -152,13 +236,25 @@ public class MediaServiceImpl implements MediaService {
 
         // Xóa file
         try {
-            var filePath = media.getFilePath();
-            var file = new File(filePath);
+            var dbFilePath = media.getFilePath();
 
-            if (file.exists()) {
-                if (!file.delete()) {
-                    System.out.println("Không thể xóa file: " + filePath);
-                    // Vẫn tiếp tục thực hiện, không throw exception để tránh lỗi transaction
+            if (dbFilePath != null && !dbFilePath.isEmpty()) {
+                // Tạo đường dẫn đầy đủ để xóa file
+                var fullPath = Paths.get(uploadDir, dbFilePath).toString();
+                var file = new File(fullPath);
+
+                if (file.exists()) {
+                    if (file.delete()) {
+                        System.out.println("Đã xóa file thành công: " + fullPath);
+                    } else {
+                        System.out.println("Không thể xóa file: " + fullPath);
+                        // Log chi tiết hơn để debug
+                        System.out.println("File exists: " + file.exists());
+                        System.out.println("File canRead: " + file.canRead());
+                        System.out.println("File canWrite: " + file.canWrite());
+                    }
+                } else {
+                    System.out.println("File không tồn tại: " + fullPath);
                 }
             }
         } catch (Exception e) {

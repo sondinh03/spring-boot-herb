@@ -104,7 +104,7 @@ public final class FileUtils {
      * @param directoryPath Đường dẫn thư mục
      * @return true nếu thư mục đã tồn tại hoặc được tạo thành công, false nếu có lỗi
      */
-    public static boolean createDirectoryIfNotExist(String directoryPath) {
+    public static boolean createDirectoryIfNotExists(String directoryPath) {
         try {
             Files.createDirectories(Path.of(directoryPath));
             return true;
