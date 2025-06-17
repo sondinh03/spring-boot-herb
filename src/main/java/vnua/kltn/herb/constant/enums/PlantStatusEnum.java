@@ -7,8 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PlantStatusEnum {
     DRAFT(1, "Bản nháp"),
-    PUBLISHED(2, "Đã xuất bản"),
-    PENDING(3, "Đã lưu trữ"),
+    PENDING(2, "Chờ duyệt"),
+    PUBLISHED(3, "Đã xuất bản"),
+    ARCHIVED(4, "Lưu trữ"),
+    REJECTED(5, "Từ chối")
     ;
     
     private final Integer type;

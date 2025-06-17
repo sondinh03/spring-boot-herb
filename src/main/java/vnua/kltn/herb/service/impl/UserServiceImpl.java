@@ -72,7 +72,7 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
     @Override
     public UserResponseDto create(UserRequestDto requestDto) throws HerbException {
         if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm()))
-            throw new HerbException(CONFIRM_PASSWORD_ERROR);
+            throw new HerbException(CONFIRM_PASSWORD_MISMATCH);
 
         // Check if username already exists
         if (userRepo.existsByUsername(requestDto.getUsername())) {
@@ -123,7 +123,7 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
         // Xử lý cập nhật mật khẩu nếu có
         if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
             if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm())) {
-                throw new HerbException(CONFIRM_PASSWORD_ERROR);
+                throw new HerbException(CONFIRM_PASSWORD_MISMATCH);
             }
             user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }

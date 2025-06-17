@@ -28,7 +28,7 @@ public class RestUserController {
         return new HerbResponse<>(userService.search(dto));
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public HerbResponse<UserResponseDto> create(@Valid @RequestBody UserRequestDto requestDto) throws HerbException {
         var createdUser = userService.create(requestDto);
         return new HerbResponse<>(createdUser);

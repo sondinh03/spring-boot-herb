@@ -1,7 +1,5 @@
 package vnua.kltn.herb.dto.response;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

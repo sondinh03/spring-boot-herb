@@ -32,7 +32,7 @@ public class DiseasesServiceImpl extends BaseSearchService<Diseases, DiseasesRes
     @Override
     public DiseasesResponseDto create(DiseasesRequestDto requestDto) throws HerbException {
         if (diseasesRepo.existsByName(requestDto.getName())) {
-            throw  new HerbException(ErrorCodeEnum.EXISTED_NAME);
+            throw  new HerbException(ErrorCodeEnum.DISEASE_EXISTS);
         }
 
         var diseasesEntity = diseasesMapper.requestToEntity(requestDto);

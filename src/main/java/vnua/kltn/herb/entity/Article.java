@@ -25,9 +25,8 @@ public class Article extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "featured_image")
-    private Media featuredImage;
+    @Column(name = "featured_image")
+    private Long featuredImage;
 
     @Column(nullable = false)
     private Integer status = 1; // Default: DRAFT
@@ -38,38 +37,15 @@ public class Article extends BaseEntity {
     @Column(name = "allow_comments")
     private Boolean allowComments = true;
 
-    private Integer views = 0;
+    @Column(name = "views")
+    private Long views;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+    @Column(name = "author_id")
+    private Long authorId;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Diseases category;
+    @Column(name = "disease_id")
+    private Long diseaseId;
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
-
-    /*
-    @ManyToMany
-    @JoinTable(
-            name = "article_tags",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private List<Tag> tags;
-
-    @ManyToMany
-    @JoinTable(
-            name = "article_plants",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "plant_id")
-    )
-    private List<Plant> plants;
-
-    @OneToMany(mappedBy = "article")
-    private List<Comment> comments;
-
-     */
 }

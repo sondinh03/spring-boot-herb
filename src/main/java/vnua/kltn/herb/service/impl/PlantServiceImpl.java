@@ -1,25 +1,35 @@
 package vnua.kltn.herb.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
+import vnua.kltn.herb.dto.request.MediaRequestDto;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.entity.Plant;
 import vnua.kltn.herb.entity.PlantMedia;
+import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.PlantMediaRepository;
 import vnua.kltn.herb.repository.PlantRepository;
 import vnua.kltn.herb.service.BaseSearchService;
+import vnua.kltn.herb.service.MediaService;
 import vnua.kltn.herb.service.PlantService;
+import vnua.kltn.herb.service.UserService;
 import vnua.kltn.herb.service.mapper.PlantMapper;
 import vnua.kltn.herb.utils.SlugGenerator;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +38,10 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     private final PlantRepository plantRepo;
     private final PlantMapper plantMapper;
     private final PlantMediaRepository plantMediaRepo;
+    private final MediaService mediaService;
+    private final UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(PlantServiceImpl.class);
 
     @Override
     @Transactional
@@ -79,5 +93,42 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
         plantMapper.setValue(requestDto, plant);
         plantRepo.save(plant);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public Boolean uploadMedia(Long plantId, MediaRequestDto requestDto) throws HerbException, IOException {
+        logger.info("Starting media upload for plantId: {} by user: {}", plantId, userService.getCurrentUser().getId());
+
+        // Validate plantId exists first
+        if (!plantRepo.existsById(plantId)) {
+            throw new HerbException(ErrorCodeEnum.NOT_FOUND);
+        }
+
+        var mediaResponse = mediaService.upload(requestDto);
+        if (mediaResponse == null || mediaResponse.getId() == null) {
+            logger.error("Invalid media response for plantId: {}", plantId);
+            throw new HerbException(ErrorCodeEnum.INTERNAL_SERVER_ERROR, "Không thể lấy thông tin media");
+        }
+
+        // Xác định isFeatured
+        boolean isFeatured = Optional.ofNullable(requestDto.getIsFeatured())
+                .orElseGet(() -> !plantMediaRepo.existsById_PlantId(plantId));
+
+        // Tạo và lưu PlantMedia
+        var plantMedia = PlantMedia.builder()
+                .id(new PlantMediaId(plantId, mediaResponse.getId()))
+                .isFeatured(isFeatured)
+                .build();
+
+        try {
+            plantMediaRepo.save(plantMedia);
+            logger.info("Successfully linked media {} to plant {}", mediaResponse.getId(), plantId);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to save PlantMedia for plantId {} and mediaId {}: {}",
+                    plantId, mediaResponse.getId(), e.getMessage(), e);
+            throw new HerbException(ErrorCodeEnum.FILE_DATABASE_ERROR, "Lỗi khi lưu liên kết PlantMedia");
+        }
     }
 }
