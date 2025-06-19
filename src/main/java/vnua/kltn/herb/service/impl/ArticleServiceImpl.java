@@ -16,6 +16,7 @@ import vnua.kltn.herb.repository.ArticleRepository;
 import vnua.kltn.herb.service.ArticleService;
 import vnua.kltn.herb.service.BaseSearchService;
 import vnua.kltn.herb.service.mapper.ArticleMapper;
+import vnua.kltn.herb.utils.SlugGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class ArticleServiceImpl extends BaseSearchService<Article, ArticleRespon
     @Override
     public ArticleResponseDto create(ArticleRequestDto requestDto) {
         var articleEntity = articleMapper.requestToEntity(requestDto);
+        articleEntity.setSlug(SlugGenerator.generateSlug(articleEntity.getTitle()));
         articleRepo.save(articleEntity);
         return articleMapper.entityToResponse(articleEntity);
     }
