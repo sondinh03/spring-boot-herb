@@ -34,6 +34,8 @@ public enum ErrorCodeEnum {
     // -- disease management errors (4003xx)
     DISEASE_EXISTS(400301, "Loại bệnh đã tồn tại"),
 
+    //
+    TITLE_EXISTS(400401, "Tiêu đề đã tồn tại"),
 
     // -- File management errors (4003xx)
     EMPTY_FILE(400301, "File không được để trống"),
