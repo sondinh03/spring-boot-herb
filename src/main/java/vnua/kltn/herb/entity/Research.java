@@ -44,20 +44,4 @@ public class Research extends BaseEntity {
     private Integer status = 1; // Default: DRAFT
 
     private Integer views = 0;
-
-    @ManyToMany
-    @JoinTable(
-            name = "research_plants",
-            joinColumns = @JoinColumn(name = "research_id"),
-            inverseJoinColumns = @JoinColumn(name = "plant_id")
-    )
-    private List<Plant> plants;
-
-    @ManyToMany
-    @JoinTable(
-            name = "research_tags",
-            joinColumns = @JoinColumn(name = "research_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private List<Tag> tags;
 }
