@@ -30,5 +30,7 @@ public class MediaRequestDto {
 
     private Long plantId;
 
+    private Long articleId;
+
     private Boolean isFeatured;
 }

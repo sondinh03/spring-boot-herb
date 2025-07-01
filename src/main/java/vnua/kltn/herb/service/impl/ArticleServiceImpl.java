@@ -9,9 +9,8 @@ import vnua.kltn.herb.dto.response.ArticleResponseDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.entity.Article;
-import vnua.kltn.herb.entity.Plant;
-import vnua.kltn.herb.entity.PlantMedia;
 import vnua.kltn.herb.exception.HerbException;
+import vnua.kltn.herb.repository.ArticleMediaRepository;
 import vnua.kltn.herb.repository.ArticleRepository;
 import vnua.kltn.herb.service.ArticleService;
 import vnua.kltn.herb.service.BaseSearchService;
@@ -19,14 +18,13 @@ import vnua.kltn.herb.service.mapper.ArticleMapper;
 import vnua.kltn.herb.utils.SlugGenerator;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ArticleServiceImpl extends BaseSearchService<Article, ArticleResponseDto> implements ArticleService {
     private final ArticleRepository articleRepo;
     private final ArticleMapper articleMapper;
+    private final ArticleMediaRepository articleMediaRepo;
 
     @Override
     public ArticleResponseDto create(ArticleRequestDto requestDto) {
@@ -45,7 +43,29 @@ public class ArticleServiceImpl extends BaseSearchService<Article, ArticleRespon
     @Override
     public Page<ArticleResponseDto> search(SearchDto searchDto) {
         List<String> searchableFields = List.of("id", "title", "excerpt", "content", "diseaseId", "authorId");
-        return super.search(searchDto, articleRepo, articleRepo, articleMapper::entityToResponse, searchableFields);
+        var articles = super.search(searchDto, articleRepo, articleRepo, articleMapper::entityToResponse, searchableFields);
+
+        /*
+        var articleIds = articles.getContent().stream().map(ArticleResponseDto::getId).toList();
+
+        var featuredMedias = articleMediaRepo.findByIdArticleIdInAndIsFeaturedTrue(articleIds);
+
+        Map<Long, ArticleMedia> mediaMap = featuredMedias.stream()
+                .collect(Collectors.toMap(
+                        am -> am.getId().getArticleId(),
+                        am -> am,
+                        (am1, am2) -> am1 // Giữ bản ghi đầu tiên nếu trùng
+                ));
+
+        return articles.map(article -> {
+            var media = mediaMap.get(article.getId());
+            if (media != null) {
+                article.setFeaturedImage(media.getId().getMediaId());
+            }
+            return article;
+        });
+         */
+        return articles;
     }
 
     @Override

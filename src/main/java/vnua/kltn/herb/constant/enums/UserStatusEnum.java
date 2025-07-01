@@ -7,10 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserStatusEnum {
     ACTIVE(1, "Hoạt động"),
-    INACTIVE(2, "Tạm dừng hoạt động"),
+    PENDING(2, "Chờ duyệt"),
     BLOCKED(3, "Bị chặn"),
-    PENDING(4, "Chờ duyệt"),
-    DELETED(5, "Đã xóa"),
     ;
     
     private final Integer type;
