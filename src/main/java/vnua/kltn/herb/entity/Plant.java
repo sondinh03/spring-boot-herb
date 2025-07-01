@@ -234,9 +234,6 @@ public class Plant extends BaseEntity {
     @Column(nullable = false)
     private Integer status = 1; // Default: DRAFT
 
-    /**
-     * Cờ đánh dấu cây dược liệu có được nổi bật (featured) hay không
-     */
     private Boolean featured = false;
 
     /**
