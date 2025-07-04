@@ -47,4 +47,17 @@ public class PlantResponseDto extends BaseResponseDto {
     private List<MediaDto> media;
     private Long familyId;
     private Long generaId;
+    private String stemDescription;
+    private String leafDescription;
+    private String flowerDescription;
+    private String fruitDescription;
+    private String rootDescription;
+    private Long activeCompoundId;
+    private String activeCompoundDescription;
+    private Long dataSourceId;
+    private String sourceName;
+    private String sourceAuthor;
+    private String sourcePublisher;
+    private Integer sourcePublicationYear;
+    private String sourceType;
 }

@@ -13,83 +13,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "plants")
 public class Plant extends BaseEntity {
-    /*
-    @Column(nullable = false)
-    private String name;
-
-    @Column(name = "scientific_name", nullable = false)
-    private String scientificName;
-
-    @Column(nullable = false, unique = true)
-    private String slug;
-
-    @Column(name = "family")
-    private String family;
-
-    @Column(name = "family_id")
-    private Long familyId;
-
-    @Column(name = "genus")
-    private String genus;
-
-    @Column(name = "genera_id")
-    private Long generaId;
-
-    @Column(name = "other_names")
-    private String otherNames;
-
-    @Column(name = "parts_used")
-    private String partsUsed;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "botanical_characteristics", columnDefinition = "TEXT")
-    private String botanicalCharacteristics;
-
-    @Column(name = "chemical_composition", columnDefinition = "TEXT")
-    private String chemicalComposition;
-
-    @Column(columnDefinition = "TEXT")
-    private String distribution;
-
-    private String altitude;
-
-    @Column(name = "harvest_season")
-    private String harvestSeason;
-
-    @Column(columnDefinition = "TEXT")
-    private String ecology;
-
-    @Column(name = "medicinal_uses", columnDefinition = "TEXT")
-    private String medicinalUses;
-
-    @Column(columnDefinition = "TEXT")
-    private String indications;
-
-    @Column(columnDefinition = "TEXT")
-    private String contraindications;
-
-    @Column(columnDefinition = "TEXT")
-    private String dosage;
-
-    @Column(name = "folk_remedies", columnDefinition = "TEXT")
-    private String folkRemedies;
-
-    @Column(name = "side_effects", columnDefinition = "TEXT")
-    private String sideEffects;
-
-    @Column(name = "diseases_id")
-    private Long diseaseId;
-
-    @Column(nullable = false)
-    private Integer status = 1; // Default: DRAFT
-
-    private Boolean featured = false;
-
-    private Integer views = 0;
-     */
-
     /**
      * Tên tiếng Việt của cây dược liệu
      */
@@ -240,4 +163,18 @@ public class Plant extends BaseEntity {
      * Số lượt xem của cây dược liệu
      */
     private Integer views = 0;
+
+    private String stemDescription;
+
+    private String leafDescription;
+
+    private String flowerDescription;
+
+    private String fruitDescription;
+
+    private String rootDescription;
+
+    private Long activeCompoundId;
+
+    private Long dataSourceId;
 }

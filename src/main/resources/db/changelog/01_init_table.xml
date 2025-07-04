@@ -15,4 +15,19 @@
     <changeSet id="20250615_04_add_table_article_media" author="SonDC">
         <sqlFile path="db/sql/20250615_04_add_table_article_media.sql"/>
     </changeSet>
+    <changeSet id="20250704_05_add_clm_plants" author="SonDC">
+        <sqlFile path="db/sql/20250704_05_add_clm_plants.sql"/>
+    </changeSet>
+    <changeSet id="20250704_06_add_table_active_compounds" author="SonDC">
+        <sqlFile path="db/sql/20250704_06_add_table_active_compounds.sql"/>
+    </changeSet>
+    <changeSet id="20250704_07_modify_tbl_data_source" author="SonDC">
+        <sqlFile path="db/sql/20250704_07_modify_tbl_data_source.sql"/>
+    </changeSet>
+    <changeSet id="20250704_08_add_clm_data_source" author="SonDC">
+        <sqlFile path="db/sql/20250704_08_add_clm_data_source.sql"/>
+    </changeSet>
+    <changeSet id="20250704_09_add_clm_tbl_plants" author="SonDC">
+        <sqlFile path="db/sql/20250704_09_add_clm_tbl_plants.sql"/>
+    </changeSet>
 </databaseChangeLog>

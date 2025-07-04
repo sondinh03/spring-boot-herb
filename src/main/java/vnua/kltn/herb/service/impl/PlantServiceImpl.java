@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import vnua.kltn.herb.constant.enums.DataSourceTypeEnum;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 import vnua.kltn.herb.dto.request.MediaRequestDto;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
@@ -18,10 +19,7 @@ import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.PlantMediaRepository;
 import vnua.kltn.herb.repository.PlantRepository;
-import vnua.kltn.herb.service.BaseSearchService;
-import vnua.kltn.herb.service.MediaService;
-import vnua.kltn.herb.service.PlantService;
-import vnua.kltn.herb.service.UserService;
+import vnua.kltn.herb.service.*;
 import vnua.kltn.herb.service.mapper.PlantMapper;
 import vnua.kltn.herb.utils.SlugGenerator;
 
@@ -40,6 +38,7 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     private final PlantMediaRepository plantMediaRepo;
     private final MediaService mediaService;
     private final UserService userService;
+    private final DataSourceService dataSourceService;
 
     private static final Logger logger = LoggerFactory.getLogger(PlantServiceImpl.class);
 
@@ -60,7 +59,18 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     @Override
     public PlantResponseDto getById(Long id) throws HerbException {
         var plantEntity = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
-        return plantMapper.entityToResponse(plantEntity);
+        var plantResponse = plantMapper.entityToResponse(plantEntity);
+
+        var dataSource = dataSourceService.getById(plantEntity.getDataSourceId());
+        plantResponse.setSourceName(dataSource.getName());
+        plantResponse.setSourceAuthor(dataSource.getAuthor());
+        var typeSource = dataSource.getTypeSource();
+        var typeSourceEnum = DataSourceTypeEnum.fromType(typeSource);
+        plantResponse.setSourceType(typeSourceEnum.getDescription());
+        plantResponse.setSourceName(dataSource.getName());
+        plantResponse.setSourcePublicationYear(dataSource.getPublicationYear());
+        plantResponse.setSourcePublisher(dataSource.getPublisher());
+        return plantResponse;
     }
 
     public Page<PlantResponseDto> search(SearchDto searchDto) {
