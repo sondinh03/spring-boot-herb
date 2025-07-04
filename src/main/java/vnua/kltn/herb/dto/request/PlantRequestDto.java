@@ -48,8 +48,11 @@ public class PlantRequestDto {
     private String createdByUsername;
     private String createdAt;
     private String updatedAt;
-//    private List<CategoryDto> categories;
-//    private List<TagDto> tags;
-//    private List<MediaDto> media;
-//    private MediaDto featuredImage;
+    private String stemDescription;
+    private String leafDescription;
+    private String flowerDescription;
+    private String fruitDescription;
+    private String rootDescription;
+    private Long activeCompoundId;
+    private Long dataSourceId;
 }
