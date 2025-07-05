@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/files/**").permitAll()
                                 .requestMatchers("/api/diseases/**").permitAll()
+                                .requestMatchers("/api/active-compound/**").permitAll()
                                 .requestMatchers("/api/families/**").permitAll()
                                 .requestMatchers("/api/articles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
@@ -72,7 +73,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/research/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/users/**").permitAll()
 
                         .anyRequest().authenticated()
                 );
