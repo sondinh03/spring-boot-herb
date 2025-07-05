@@ -53,7 +53,7 @@ public class PlantResponseDto extends BaseResponseDto {
     private String fruitDescription;
     private String rootDescription;
     private Long activeCompoundId;
-    private String activeCompoundDescription;
+    private String activeCompound;
     private Long dataSourceId;
     private String sourceName;
     private String sourceAuthor;

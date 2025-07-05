@@ -1,6 +1,7 @@
 package vnua.kltn.herb.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.hibernate.HibernateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,7 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     private final MediaService mediaService;
     private final UserService userService;
     private final DataSourceService dataSourceService;
+    private final ActiveCompoundService activeCompoundService;
 
     private static final Logger logger = LoggerFactory.getLogger(PlantServiceImpl.class);
 
@@ -58,20 +60,31 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
 
     @Override
     public PlantResponseDto getById(Long id) throws HerbException {
-        var plantEntity = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
-        var plantResponse = plantMapper.entityToResponse(plantEntity);
+        var plantDetails = plantRepo.findByIdWithDetails(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
 
-        var dataSource = dataSourceService.getById(plantEntity.getDataSourceId());
-        plantResponse.setSourceName(dataSource.getName());
-        plantResponse.setSourceAuthor(dataSource.getAuthor());
-        var typeSource = dataSource.getTypeSource();
-        var typeSourceEnum = DataSourceTypeEnum.fromType(typeSource);
-        plantResponse.setSourceType(typeSourceEnum.getDescription());
-        plantResponse.setSourceName(dataSource.getName());
-        plantResponse.setSourcePublicationYear(dataSource.getPublicationYear());
-        plantResponse.setSourcePublisher(dataSource.getPublisher());
+        var plantResponse = plantMapper.entityToResponse(plantDetails.getPlant());
+
+        // Enrich with data source
+        var dataSource = plantDetails.getDataSource();
+        if (dataSource != null) {
+            plantResponse.setSourceName(dataSource.getName());
+            plantResponse.setSourceAuthor(dataSource.getAuthor());
+            plantResponse.setSourcePublicationYear(dataSource.getPublicationYear());
+            plantResponse.setSourcePublisher(dataSource.getPublisher());
+
+            var typeSourceEnum = DataSourceTypeEnum.fromType(dataSource.getTypeSource());
+            plantResponse.setSourceType(typeSourceEnum.getDescription());
+        }
+
+        // Enrich with active compound
+        var activeCompound = plantDetails.getActiveCompound();
+        if (activeCompound != null) {
+            plantResponse.setActiveCompound(activeCompound.getName());
+        }
+
         return plantResponse;
     }
+
 
     public Page<PlantResponseDto> search(SearchDto searchDto) {
         List<String> searchableFields = List.of("id", "name", "scientificName", "description", "diseaseId", "familyId", "generaId", "chemicalComposition");
