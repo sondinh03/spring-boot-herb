@@ -145,4 +145,26 @@ public class JwtTokenProvider {
         return claims.getExpiration();
     }
 
+    public long getAccessTokenExpiration() {
+        return jwtExpirationInMs;
+    }
+
+    public long getRefreshTokenExpiration() {
+        return refreshTokenExpirationInMs;
+    }
+
+    public long getRefreshTokenExpirationInSeconds() {
+        return refreshTokenExpirationInMs / 1000;
+    }
+
+    // Method bổ sung: Kiểm tra token có hết hạn không
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expiration = getExpirationDateFromToken(token);
+            return expiration.before(new Date());
+        } catch (Exception e) {
+            log.error("Error checking token expiration", e);
+            return true; // Nếu có lỗi thì coi như token đã hết hạn
+        }
+    }
 }

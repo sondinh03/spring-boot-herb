@@ -39,7 +39,7 @@ public class RestActiveCompoundController {
         return new HerbResponse<>(activeCompoundService.search(dto));
     }
 
-    @PutMapping()
+    @PutMapping(value = "/{id}")
     public HerbResponse<Boolean> update(@PathVariable("id") Long id, @RequestBody @Valid ActiveCompoundRequestDto requestDto) throws HerbException {
         return new HerbResponse<>(activeCompoundService.update(id, requestDto));
     }

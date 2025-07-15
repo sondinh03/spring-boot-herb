@@ -117,7 +117,23 @@ public abstract class BaseSearchService<T, R> {
                 }
             }
 
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            // Xử lý excludeId
+            if (searchDto.getExcludeId() != null) {
+                Class<?> idType = root.get("id").getJavaType(); // Giả sử ID là trường "id"
+                if (Number.class.isAssignableFrom(idType)) {
+                    try {
+                        Number excludeId = NumberFormat.getInstance().parse(searchDto.getExcludeId().toString());
+                        predicates.add(criteriaBuilder.notEqual(root.get("id"), excludeId));
+                    } catch (ParseException e) {
+                        predicates.add(criteriaBuilder.notEqual(root.get("id"), searchDto.getExcludeId()));
+                    }
+                } else {
+                    predicates.add(criteriaBuilder.notEqual(root.get("id"), searchDto.getExcludeId()));
+                }
+            }
+
+//            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            return predicates.isEmpty() ? criteriaBuilder.conjunction() : criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 

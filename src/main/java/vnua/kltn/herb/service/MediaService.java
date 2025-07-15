@@ -13,5 +13,11 @@ public interface MediaService {
 
     byte[] getData(Long id) throws HerbException, IOException;
 
+    byte[] previewPdf(Long id) throws HerbException, IOException;
+
     Boolean delete(Long id) throws HerbException;
+
+    byte[] downloadFile(Long id) throws HerbException, IOException;
+
+    void linkMediaToArticle(Long mediaId, Long articleId, Boolean isFeatured) throws HerbException;
 }

@@ -30,4 +30,25 @@
     <changeSet id="20250704_09_add_clm_tbl_plants" author="SonDC">
         <sqlFile path="db/sql/20250704_09_add_clm_tbl_plants.sql"/>
     </changeSet>
+    <changeSet id="20250705_10_add_clm_plants_and_articles" author="SonDC">
+        <sqlFile path="db/sql/20250705_10_add_clm_plants_and_articles.sql"/>
+    </changeSet>
+    <changeSet id="20250705_11_add_tbl_favorites" author="SonDC">
+        <sqlFile path="db/sql/20250705_11_add_tbl_favorites.sql"/>
+    </changeSet>
+    <changeSet id="20250705_12_add_tbl_collections" author="SonDC">
+        <sqlFile path="db/sql/20250705_12_add_tbl_collections.sql"/>
+    </changeSet>
+    <changeSet id="20250705_13_add_tbl_collection_items" author="SonDC">
+        <sqlFile path="db/sql/20250705_13_add_tbl_collection_items.sql"/>
+    </changeSet>
+    <changeSet id="20250708_add_clm_tbl_research" author="SonDC">
+        <sqlFile path="db/sql/20250708_add_clm_tbl_research.sql"/>
+    </changeSet>
+    <changeSet id="20250710_15_add_clm_tbl_research" author="SonDC">
+        <sqlFile path="db/sql/20250710_15_add_clm_tbl_research.sql"/>
+    </changeSet>
+    <changeSet id="20250710_16_add_clm_tbl_expert" author="SonDC">
+        <sqlFile path="db/sql/20250710_16_add_clm_tbl_expert.sql"/>
+    </changeSet>
 </databaseChangeLog>

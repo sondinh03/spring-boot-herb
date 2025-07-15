@@ -18,6 +18,7 @@ import vnua.kltn.herb.entity.PlantMedia;
 import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.entity.Research;
 import vnua.kltn.herb.exception.HerbException;
+import vnua.kltn.herb.repository.MediaRepository;
 import vnua.kltn.herb.repository.PlantMediaRepository;
 import vnua.kltn.herb.repository.PlantRepository;
 import vnua.kltn.herb.repository.ResearchRepository;
@@ -32,108 +33,125 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static vnua.kltn.herb.constant.enums.ErrorCodeEnum.*;
+import static vnua.kltn.herb.utils.SlugGenerator.generateSlug;
+
 @Service
 @AllArgsConstructor
 public class ResearchServiceImpl extends BaseSearchService<Research, ResearchResponseDto> implements ResearchService {
     private final ResearchRepository researchRepo;
     private final ResearchMapper researchMapper;
+    private final MediaRepository mediaRepo;
 
     private static final Logger logger = LoggerFactory.getLogger(ResearchServiceImpl.class);
-    private final ResearchRepository researchRepository;
+    private final SlugGenerator slugGenerator;
+
+    private void validateCreateRequest(ResearchRequestDto requestDto) throws HerbException {
+        // Basic null check (nếu không dùng Bean Validation)
+        if (requestDto == null) {
+            throw new HerbException(ErrorCodeEnum.INVALID_REQUEST);
+        }
+
+        // Business logic validations
+        validateTitleUniqueness(requestDto.getTitle());
+        validateMediaExists(requestDto.getMediaId());
+    }
+
+    private void validateUpdateRequest(Long id, ResearchRequestDto requestDto) throws HerbException {
+        if (requestDto == null) {
+            throw new HerbException(ErrorCodeEnum.INVALID_REQUEST);
+        }
+
+        // For update, check uniqueness excluding current record
+        if (requestDto.getTitle() != null) {
+            validateTitleUniquenessForUpdate(id, requestDto.getTitle());
+        }
+
+        if (requestDto.getMediaId() != null) {
+            validateMediaExists(requestDto.getMediaId());
+        }
+    }
+
+    // Business logic validations
+    private void validateTitleUniqueness(String title) throws HerbException {
+        if (title != null && researchRepo.existsByTitle(title.trim())) {
+            throw new HerbException(ErrorCodeEnum.TITLE_EXISTS);
+        }
+    }
+
+    private void validateTitleUniquenessForUpdate(Long id, String title) throws HerbException {
+        if (title != null && researchRepo.existsByTitleAndIdNot(title.trim(), id)) {
+            throw new HerbException(ErrorCodeEnum.TITLE_EXISTS);
+        }
+    }
+
+    private void validateMediaExists(Long mediaId) throws HerbException {
+        if (mediaId != null && !mediaRepo.existsById(mediaId)) {
+            throw new HerbException(ErrorCodeEnum.MEDIA_NOT_FOUND);
+        }
+    }
 
     @Override
     @Transactional
     public ResearchResponseDto create(ResearchRequestDto requestDto) throws HerbException {
-        if (researchRepo.existsByTitle(requestDto.getTitle())) {
-            throw new HerbException(ErrorCodeEnum.TITLE_EXISTS);
+        validateCreateRequest(requestDto);
+
+        var research = researchMapper.requestToEntity(requestDto);
+        research.setSlug(generateSlug(requestDto.getTitle()));
+        var savedResearch = researchRepo.save(research);
+        var response = researchMapper.entityToResponse(savedResearch);
+
+        if (savedResearch.getMediaId() != null) {
+            var media = mediaRepo.findById(savedResearch.getMediaId()).orElseThrow(() -> new HerbException(MEDIA_NOT_FOUND));
+            response.setMediaUrl(media.getUrlFile());
         }
 
-        var researchEntity = researchMapper.requestToEntity(requestDto);
-        researchEntity.setSlug(SlugGenerator.generateSlug(requestDto.getTitle()));
-        researchRepo.save(researchEntity);
-        return researchMapper.entityToResponse(researchEntity);
+        return response;
     }
 
     @Override
+    @Transactional
+    public ResearchResponseDto update(Long id, ResearchRequestDto requestDto) throws HerbException {
+        validateUpdateRequest(id, requestDto);
+        var existingResearch = researchRepo.findById(id).orElseThrow(() -> new HerbException(RESEARCH_NOT_FOUND));
+
+        researchMapper.setValue(requestDto, existingResearch);
+        researchRepo.save(existingResearch);
+        var response = researchMapper.entityToResponse(existingResearch);
+
+        if (existingResearch.getMediaId() != null) {
+            var media = mediaRepo.findById(existingResearch.getMediaId()).orElseThrow(() -> new HerbException(MEDIA_NOT_FOUND));
+            response.setMediaUrl(media.getUrlFile());
+        }
+
+        return response;
+    }
+
+
+    @Override
+    public ResearchResponseDto getById(Long id) throws HerbException {
+        if (id == null) {
+            throw new HerbException(INVALID_REQUEST);
+        }
+
+        var research = researchRepo.findById(id).orElseThrow(() -> new HerbException(RESEARCH_NOT_FOUND));
+        var response = researchMapper.entityToResponse(research);
+
+        if (research.getMediaId() != null) {
+            var media = mediaRepo.findById(research.getMediaId()).orElseThrow(() -> new HerbException(NOT_FOUND));
+            response.setMediaUrl(media.getUrlFile());
+        }
+
+        return response;
+    }
+
+
+
+    @Override
     public Page<ResearchResponseDto> search(SearchDto searchDto) {
-        List<String> searchableFields = List.of("id", "title", "content");
+        List<String> searchableFields = List.of("id", "title", "content", "journal");
 
         return super.search(searchDto, researchRepo, researchRepo, researchMapper::entityToResponse, searchableFields);
     }
 
-//
-//    @Override
-//    public PlantResponseDto getById(Long id) throws HerbException {
-//        var plantEntity = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
-//        return plantMapper.entityToResponse(plantEntity);
-//    }
-//
-//    public Page<PlantResponseDto> search(SearchDto searchDto) {
-//        List<String> searchableFields = List.of("id", "name", "scientificName", "description", "diseaseId", "familyId", "generaId", "chemicalComposition");
-//        var plants = super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
-//
-//        List<Long> plantIds = plants.getContent().stream().map(PlantResponseDto::getId).toList();
-//
-//        var featuredMedias = plantMediaRepo.findByIdPlantIdInAndIsFeaturedTrue(plantIds);
-//        Map<Long, PlantMedia> mediaMap = featuredMedias.stream()
-//                .collect(Collectors.toMap(
-//                        pm -> pm.getId().getPlantId(),
-//                        pm -> pm,
-//                        (pm1, pm2) -> pm1 // Giữ bản ghi đầu tiên nếu trùng
-//                ));
-//
-//        return plants.map(plant -> {
-//            var media = mediaMap.get(plant.getId());
-//            if (media != null) {
-//                plant.setFeaturedMediaId(media.getId().getMediaId());
-//            }
-//            return plant;
-//        });
-//    }
-//
-//    @Override
-//    public Boolean update(Long id, PlantRequestDto requestDto) throws HerbException {
-//        var plant = plantRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
-//
-//        plantMapper.setValue(requestDto, plant);
-//        plantRepo.save(plant);
-//        return true;
-//    }
-//
-//    @Override
-//    @Transactional
-//    public Boolean uploadMedia(Long plantId, MediaRequestDto requestDto) throws HerbException, IOException {
-//        logger.info("Starting media upload for plantId: {} by user: {}", plantId, userService.getCurrentUser().getId());
-//
-//        // Validate plantId exists first
-//        if (!plantRepo.existsById(plantId)) {
-//            throw new HerbException(ErrorCodeEnum.NOT_FOUND);
-//        }
-//
-//        var mediaResponse = mediaService.upload(requestDto);
-//        if (mediaResponse == null || mediaResponse.getId() == null) {
-//            logger.error("Invalid media response for plantId: {}", plantId);
-//            throw new HerbException(ErrorCodeEnum.INTERNAL_SERVER_ERROR, "Không thể lấy thông tin media");
-//        }
-//
-//        // Xác định isFeatured
-//        boolean isFeatured = Optional.ofNullable(requestDto.getIsFeatured())
-//                .orElseGet(() -> !plantMediaRepo.existsById_PlantId(plantId));
-//
-//        // Tạo và lưu PlantMedia
-//        var plantMedia = PlantMedia.builder()
-//                .id(new PlantMediaId(plantId, mediaResponse.getId()))
-//                .isFeatured(isFeatured)
-//                .build();
-//
-//        try {
-//            plantMediaRepo.save(plantMedia);
-//            logger.info("Successfully linked media {} to plant {}", mediaResponse.getId(), plantId);
-//            return true;
-//        } catch (Exception e) {
-//            logger.error("Failed to save PlantMedia for plantId {} and mediaId {}: {}",
-//                    plantId, mediaResponse.getId(), e.getMessage(), e);
-//            throw new HerbException(ErrorCodeEnum.FILE_DATABASE_ERROR, "Lỗi khi lưu liên kết PlantMedia");
-//        }
-//    }
 }

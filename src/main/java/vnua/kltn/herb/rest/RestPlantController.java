@@ -3,14 +3,19 @@ package vnua.kltn.herb.rest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vnua.kltn.herb.constant.enums.FavoritableTypeEnum;
+import vnua.kltn.herb.dto.request.FavoriteRequestDto;
 import vnua.kltn.herb.dto.request.MediaRequestDto;
 import vnua.kltn.herb.dto.request.PlantRequestDto;
+import vnua.kltn.herb.dto.response.FavoriteResponseDto;
 import vnua.kltn.herb.dto.response.MediaResponseDto;
 import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.response.HerbResponse;
+import vnua.kltn.herb.service.FavoriteService;
 import vnua.kltn.herb.service.PlantMediaService;
 import vnua.kltn.herb.service.PlantService;
 
@@ -23,6 +28,7 @@ import java.util.List;
 public class RestPlantController {
     private final PlantService plantService;
     private final PlantMediaService plantMediaService;
+    private final FavoriteService favoriteService;
 
     @PostMapping()
     HerbResponse<PlantResponseDto> create(@RequestBody @Valid PlantRequestDto requestDto) throws HerbException {
@@ -62,5 +68,14 @@ public class RestPlantController {
     @PostMapping("/{plantId}/media/upload")
     public HerbResponse<Boolean> uploadMedia(@PathVariable(value = "plantId") Long plantId, @ModelAttribute MediaRequestDto requestDto) throws HerbException, IOException {
         return new HerbResponse<>(plantService.uploadMedia(plantId, requestDto));
+    }
+
+    @PostMapping("/{plantId}/favorite")
+    @PreAuthorize("hasRole('USER')")
+    public HerbResponse<FavoriteResponseDto> favorite(@PathVariable(value = "plantId") Long plantId) throws HerbException, IOException {
+        var requestDto = new FavoriteRequestDto();
+        requestDto.setFavoritableType(FavoritableTypeEnum.PLANT.getType());
+        requestDto.setFavoritableId(plantId);
+        return new HerbResponse<>(favoriteService.toggleFavorite(requestDto));
     }
 }
