@@ -39,21 +39,11 @@ public class Expert extends BaseEntity {
     @Column(name = "contact_email")
     private String contactEmail;
 
-    @ManyToOne
-    @JoinColumn(name = "avatar")
-    private Media avatar;
+    private String zaloPhone;
+
+    @Column(name = "avatar")
+    private Long avatarId;
 
     @Column(nullable = false)
     private Integer status = 1; // Default: active
-
-    /*
-    @ManyToMany
-    @JoinTable(
-            name = "expert_plants",
-            joinColumns = @JoinColumn(name = "expert_id"),
-            inverseJoinColumns = @JoinColumn(name = "plant_id")
-    )
-    private List<Plant> plants;
-
-     */
 }

@@ -1,10 +1,13 @@
 package vnua.kltn.herb.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -16,13 +19,19 @@ public class Plant extends BaseEntity {
     /**
      * Tên tiếng Việt của cây dược liệu
      */
-    @Column(nullable = false)
+    @NotBlank(message = "Tên cây dược liệu không được để trống")
+    @Length(min = 2, max = 255, message = "Tên cây dược liệu phải từ 2-255 ký tự")
+    @Pattern(regexp = "^[\\p{L}\\p{N}\\s\\-\\.\\(\\)]+$", message = "Tên cây dược liệu chỉ chứa chữ cái, số, dấu cách và các ký tự đặc biệt cơ bản")
+    @Column(nullable = false, length = 255)
     private String name;
 
     /**
      * Tên khoa học của cây dược liệu
      */
-    @Column(name = "scientific_name", nullable = false)
+    @NotBlank(message = "Tên khoa học không được để trống")
+    @Length(min = 5, max = 255, message = "Tên khoa học phải từ 5-255 ký tự")
+    @Pattern(regexp = "^[A-Za-z\\s\\-\\.\\(\\)]+$", message = "Tên khoa học chỉ chứa chữ cái Latin, dấu cách và các ký tự đặc biệt cơ bản")
+    @Column(name = "scientific_name", nullable = false, length = 255)
     private String scientificName;
 
     /**
@@ -177,4 +186,6 @@ public class Plant extends BaseEntity {
     private Long activeCompoundId;
 
     private Long dataSourceId;
+
+    private Integer favoritesCount;
 }

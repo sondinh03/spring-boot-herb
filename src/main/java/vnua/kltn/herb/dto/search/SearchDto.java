@@ -1,5 +1,6 @@
 package vnua.kltn.herb.dto.search;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.util.Map;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class SearchDto implements Serializable {
     private Integer pageIndex = 1;
     private Integer pageSize = 12;
@@ -16,6 +18,7 @@ public class SearchDto implements Serializable {
     private String sortField;
     private String sortDirection;
     private Map<String, Object> filters = new HashMap<>();
+    private Integer excludeId;
 
     public SearchDto(Integer pageIndex, Integer pageSize) {
         this.pageIndex = pageIndex;
@@ -26,13 +29,6 @@ public class SearchDto implements Serializable {
         this.pageIndex = pageIndex;
         this.pageSize = pageSize;
         this.keyword = keyword;
-    }
-
-    public SearchDto addFilter(String key, Object value) {
-        if (key != null && value != null) {
-            this.filters.put(key, value);
-        }
-        return this;
     }
 
     public SearchDto removeFilter(String key) {
@@ -72,6 +68,10 @@ public class SearchDto implements Serializable {
         this.filters = filters != null ? filters : new HashMap<>();
     }
 
+    public void setExcludeId(Integer excludeId) {
+        this.excludeId = excludeId;
+    }
+
     @Override
     public String toString() {
         return "SearchDto{" +
@@ -80,7 +80,8 @@ public class SearchDto implements Serializable {
                 ", keyword='" + keyword + '\'' +
                 ", sortField='" + sortField + '\'' +
                 ", sortDirection='" + sortDirection + '\'' +
-                ", filters=" + filters +
+                ", filters=" + filters + '\'' +
+                ", excludeId=" + excludeId +
                 '}';
     }
 }

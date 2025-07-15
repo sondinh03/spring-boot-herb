@@ -7,5 +7,7 @@ import vnua.kltn.herb.entity.*;
 
 @Repository
 public interface ResearchRepository extends JpaRepository<Research, Long>, JpaSpecificationExecutor<Research> {
-    Boolean existsByTitle(String title);
+    boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Long id);
 }

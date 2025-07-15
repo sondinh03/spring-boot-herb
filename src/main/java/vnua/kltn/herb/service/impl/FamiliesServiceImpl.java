@@ -35,19 +35,20 @@ public class FamiliesServiceImpl extends BaseSearchService<Families, FamiliesRes
             throw  new HerbException(ErrorCodeEnum.EXISTED_USERNAME);
         }
 
-        var FamiliesEntity = familiesMapper.requestToEntity(requestDto);
-        FamiliesEntity.setSlug(SlugGenerator.generateSlug(requestDto.getName()));
-        familiesRepo.save(FamiliesEntity);
-        return familiesMapper.entityToResponse(FamiliesEntity);
+        var familyEntity = familiesMapper.requestToEntity(requestDto);
+        familyEntity.setSlug(SlugGenerator.generateSlug(requestDto.getName()));
+        familiesRepo.save(familyEntity);
+        return familiesMapper.entityToResponse(familyEntity);
     }
 
 
     @Override
     public Boolean update(Long id, FamiliesRequestDto requestDto) throws HerbException {
-        var disease = familiesRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+        var family = familiesRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
 
-        familiesMapper.setValue(requestDto, disease);
-        familiesRepo.save(disease);
+        familiesMapper.setValue(requestDto, family);
+        family.setSlug(SlugGenerator.generateSlug(requestDto.getName()));
+        familiesRepo.save(family);
         return true;
     }
 

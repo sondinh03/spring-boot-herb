@@ -187,17 +187,34 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
 
     @Override
     public Map<String, Object> refreshToken(String refreshToken) throws HerbException {
-        log.info("refresh token: {}", refreshToken);
+        log.info("Đang xử lý yêu cầu refresh token");
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            throw new HerbException(MISSING_REFRESH_TOKEN);
+        }
+
         if (!tokenProvider.validateToken(refreshToken)) {
+            log.warn("Refresh token không hợp lệ");
             throw new HerbException(INVALID_TOKEN);
         }
 
         if (!tokenProvider.isRefreshToken(refreshToken)) {
+            log.warn("Token không phải là refresh token");
             throw new HerbException(INVALID_TOKEN);
         }
 
+        // Kiểm tra token có bị blacklist không
+        if (tokenProvider.isTokenBlacklisted(refreshToken)) {
+            log.warn("Refresh token đã bị thu hồi");
+            throw new HerbException(TOKEN_BLACKLISTED);
+        }
+
+        // Lấy thông tin user
         var username = tokenProvider.getUsernameFromToken(refreshToken);
-        var user = userRepo.findByUsername(username).orElseThrow(() -> new HerbException(NOT_FOUND));
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Không tìm thấy user cho refresh token: {}", username);
+                    return new HerbException(NOT_FOUND);
+                });
 
         List<GrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_" + UserRoleEnum.getByType(user.getRoleType()))
@@ -206,21 +223,34 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
         var authentication = new UsernamePasswordAuthenticationToken(
                 username, null, authorities);
 
-        // Tạo token mới
-        String newAccessToken = tokenProvider.generateToken(authentication);
-        String newRefreshToken = tokenProvider.generateRefreshToken(username);
+        try {
+            // Tạo token mới
+            String newAccessToken = tokenProvider.generateToken(authentication);
+            String newRefreshToken = tokenProvider.generateRefreshToken(username);
 
-        // Thêm token cũ vào blacklist
-        tokenProvider.blacklistToken(refreshToken);
+            // Thêm token cũ vào blacklist
+            tokenProvider.blacklistToken(refreshToken);
 
-        // Tạo response
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", newAccessToken);
-        response.put("refreshToken", newRefreshToken);
-        response.put("tokenType", "Bearer");
-        response.put("user", userMapper.entityToResponse(user));
+            // Tạo response
+            Map<String, Object> response = new HashMap<>();
+            response.put("accessToken", newAccessToken);
+            response.put("refreshToken", newRefreshToken);
+            response.put("tokenType", "Bearer");
+            response.put("expiresIn", tokenProvider.getAccessTokenExpiration());
+            response.put("user", userMapper.entityToResponse(user));
 
-        return response;
+            log.info("Refresh token thành công cho user: {}", username);
+            return response;
+        } catch (Exception e) {
+            log.error("Lỗi khi tạo token mới cho user: {}", username, e);
+            throw new HerbException(TOKEN_GENERATION_ERROR);
+        }
+    }
+
+    private List<GrantedAuthority> taoQuyen(User user) {
+        return Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + UserRoleEnum.getByType(user.getRoleType()))
+        );
     }
 
     @Override

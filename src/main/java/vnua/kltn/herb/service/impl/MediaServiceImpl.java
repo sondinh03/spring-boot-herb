@@ -1,6 +1,7 @@
 package vnua.kltn.herb.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.HibernateError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +12,7 @@ import vnua.kltn.herb.dto.response.MediaResponseDto;
 import vnua.kltn.herb.entity.*;
 import vnua.kltn.herb.exception.HerbException;
 import vnua.kltn.herb.repository.*;
-import vnua.kltn.herb.service.ArticleService;
 import vnua.kltn.herb.service.MediaService;
-import vnua.kltn.herb.service.PlantService;
 import vnua.kltn.herb.service.UserService;
 import vnua.kltn.herb.service.mapper.MediaMapper;
 import vnua.kltn.herb.utils.FileUtils;
@@ -80,36 +79,40 @@ public class MediaServiceImpl implements MediaService {
         // Tạo URL truy cập file
         String fileUrl = baseFileUrl + "/" + relativePath;
 
-        // Lưu Media
+        var media = Media.builder()
+                .fileName(originalFilename) // Lưu tên gốc của file
+                .filePath(relativePath)
+                .urlFile(fileUrl) // Thêm URL file
+                .fileType(fileType)
+                .fileSize((int) file.getSize())
+                .altText(requestDto.getAltText())
+                .createdBy(currentUser.getUsername())
+                .build();
         try {
-            var media = Media.builder()
-                    .fileName(originalFilename) // Lưu tên gốc của file
-                    .filePath(relativePath)
-                    .urlFile(fileUrl) // Thêm URL file
-                    .fileType(fileType)
-                    .fileSize((int) file.getSize())
-                    .altText(requestDto.getAltText())
-                    .createdBy(currentUser.getUsername())
-                    .build();
-            mediaRepo.save(media);
-
-            var articleMedia = ArticleMedia.builder()
-                    .id(new ArticleMediaId(requestDto.getArticleId(), media.getId()))
-                    .isFeatured(requestDto.getIsFeatured())
-                    .build();
-
-            articleMediaRepo.save(articleMedia);
-
-
-            var article = articleRepo.findById(requestDto.getArticleId()).get();
-            article.setFeaturedImage(media.getId());
-            articleRepo.save(article);
-
-            return mediaMapper.entityToResponse(media);
+            var savedMedia = mediaRepo.save(media);
+            return mediaMapper.entityToResponse(savedMedia);
         } catch (Exception e) {
             // Xóa file nếu lưu database thất bại
             Files.deleteIfExists(savedFilePath);
             throw new HerbException(ErrorCodeEnum.FILE_DATABASE_ERROR, e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void linkMediaToArticle(Long mediaId, Long articleId, Boolean isFeatured) throws HerbException {
+        var articleMedia = ArticleMedia.builder()
+                .id(new ArticleMediaId(articleId, mediaId))
+                .isFeatured(isFeatured)
+                .build();
+
+        articleMediaRepo.save(articleMedia);
+
+        if (isFeatured) {
+            var article = articleRepo.findById(articleId)
+                    .orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+            article.setFeaturedImage(mediaId);
+            articleRepo.save(article);
         }
     }
 
@@ -124,8 +127,21 @@ public class MediaServiceImpl implements MediaService {
                 return IMAGE.getType();
             } else if (contentType.startsWith("video/")) {
                 return VIDEO.getType();
+            } else if (contentType.equals("application/pdf")) {
+                return DOCUMENT.getType(); // Hoặc tạo PDF.getType() nếu có
             }
         }
+
+        // Fallback dựa trên extension
+        var originalFilename = file.getOriginalFilename();
+        if (originalFilename != null) {
+            var extension = FileUtils.getFileExtension(originalFilename)
+                    .orElse("").toLowerCase();
+            if (extension.equals("pdf")) {
+                return DOCUMENT.getType();
+            }
+        }
+
         return DOCUMENT.getType();
     }
 
@@ -166,6 +182,21 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
+    public byte[] previewPdf(Long id) throws HerbException, IOException {
+        var media = mediaRepo.findById(id)
+                .orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+
+        // Kiểm tra xem có phải file PDF không
+        if (!media.getFileType().equals(DOCUMENT.getType()) ||
+                !media.getFileName().toLowerCase().endsWith(".pdf")) {
+            throw new HerbException(ErrorCodeEnum.UNSUPPORTED_FILE_FORMAT);
+        }
+
+        return getData(id);
+    }
+
+
+    @Override
     @Transactional
     public Boolean delete(Long id) throws HerbException {
         var media = mediaRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
@@ -199,5 +230,18 @@ public class MediaServiceImpl implements MediaService {
 
         mediaRepo.deleteById(id);
         return true;
+    }
+
+    @Override
+    public byte[] downloadFile(Long id) throws HerbException, IOException {
+        var media = mediaRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+
+        if (!media.getFileType().equals(DOCUMENT.getType()) ||
+                !media.getFileName().toLowerCase().endsWith(".pdf")) {
+            throw new HerbException(ErrorCodeEnum.UNSUPPORTED_FILE_FORMAT, "Chỉ hỗ trợ tải xuống file PDF");
+        }
+
+        var filePath = Paths.get(uploadDir, media.getFilePath()).toString();
+        return FileUtils.readFile(filePath).orElseThrow(() -> new IOException("Không thể đọc file: " + filePath));
     }
 }

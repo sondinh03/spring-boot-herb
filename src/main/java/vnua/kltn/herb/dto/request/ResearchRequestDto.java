@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,7 @@ public class ResearchRequestDto {
     private String field;
     private Integer status = 2;
     private Integer views = 0;
+    private Long mediaId;
+    private BigDecimal downloadPrice;
+    private Integer previewPages;
 }

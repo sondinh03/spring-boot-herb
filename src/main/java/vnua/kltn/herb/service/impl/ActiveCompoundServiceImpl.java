@@ -47,6 +47,7 @@ public class ActiveCompoundServiceImpl extends BaseSearchService<ActiveCompound,
         var entity = activeCompoundRepo.findById(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
 
         activeCompoundMapper.setValue(requestDto, entity);
+        entity.setSlug(SlugGenerator.generateSlug(requestDto.getName()));
         activeCompoundRepo.save(entity);
         return true;
     }

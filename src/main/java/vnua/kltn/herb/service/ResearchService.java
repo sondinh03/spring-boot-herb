@@ -13,12 +13,10 @@ import java.io.IOException;
 
 public interface ResearchService {
     ResearchResponseDto create(ResearchRequestDto requestDto) throws HerbException;
-//
-//    ResearchResponseDto getById(Long id) throws HerbException;
-//
+
+    ResearchResponseDto update(Long id, ResearchRequestDto requestDto) throws HerbException;
+
+    ResearchResponseDto getById(Long id) throws HerbException;
+
     Page<ResearchResponseDto> search(SearchDto searchDto);
-//
-//    Boolean update(Long id, ResearchRequestDto requestDto) throws HerbException;
-//
-//    Boolean uploadMedia(Long ResearchId, MediaRequestDto requestDto) throws HerbException, IOException;
 }

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import vnua.kltn.herb.constant.enums.DataSourceTypeEnum;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
@@ -18,6 +19,7 @@ import vnua.kltn.herb.entity.Plant;
 import vnua.kltn.herb.entity.PlantMedia;
 import vnua.kltn.herb.entity.PlantMediaId;
 import vnua.kltn.herb.exception.HerbException;
+import vnua.kltn.herb.repository.FamiliesRepository;
 import vnua.kltn.herb.repository.PlantMediaRepository;
 import vnua.kltn.herb.repository.PlantRepository;
 import vnua.kltn.herb.service.*;
@@ -41,6 +43,7 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     private final UserService userService;
     private final DataSourceService dataSourceService;
     private final ActiveCompoundService activeCompoundService;
+    private final FamiliesRepository familyRepo;
 
     private static final Logger logger = LoggerFactory.getLogger(PlantServiceImpl.class);
 
@@ -49,7 +52,7 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     public PlantResponseDto create(PlantRequestDto requestDto) throws HerbException {
         if (plantRepo.existsByName(requestDto.getName())
                 || plantRepo.existsByScientificName(requestDto.getScientificName())) {
-            throw new HerbException(ErrorCodeEnum.EXISTED_USERNAME);
+            throw new HerbException(ErrorCodeEnum.EXISTED_PLANT_NAME);
         }
 
         var plantEntity = plantMapper.requestToEntity(requestDto);
@@ -61,8 +64,21 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
     @Override
     public PlantResponseDto getById(Long id) throws HerbException {
         var plantDetails = plantRepo.findByIdWithDetails(id).orElseThrow(() -> new HerbException(ErrorCodeEnum.NOT_FOUND));
+        var plant = plantDetails.getPlant();
 
         var plantResponse = plantMapper.entityToResponse(plantDetails.getPlant());
+
+        // Populate family name từ familyId
+        if (plant.getFamilyId() != null) {
+            familyRepo.findById(plant.getFamilyId())
+                    .ifPresent(family -> plantResponse.setFamily(family.getName()));
+        }
+
+        // Populate genus name từ generaId
+//        if (plant.getGeneraId() != null) {
+//            generaRepo.findById(plant.getGeneraId())
+//                    .ifPresent(genera -> response.setGenus(genera.getName()));
+//        }
 
         // Enrich with data source
         var dataSource = plantDetails.getDataSource();
@@ -85,9 +101,8 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
         return plantResponse;
     }
 
-
     public Page<PlantResponseDto> search(SearchDto searchDto) {
-        List<String> searchableFields = List.of("id", "name", "scientificName", "description", "diseaseId", "familyId", "generaId", "chemicalComposition");
+        List<String> searchableFields = List.of("id", "name", "scientificName", "description", "diseaseId", "familyId", "generaId", "chemicalComposition", "medicinalUses");
         var plants = super.search(searchDto, plantRepo, plantRepo, plantMapper::entityToResponse, searchableFields);
 
         List<Long> plantIds = plants.getContent().stream().map(PlantResponseDto::getId).toList();

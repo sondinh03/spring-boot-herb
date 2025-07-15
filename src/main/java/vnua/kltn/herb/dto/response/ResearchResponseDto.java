@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -22,4 +24,8 @@ public class ResearchResponseDto extends BaseResponseDto {
     private String field;
     private Integer status;
     private Integer views;
+    private Long mediaId;
+    private BigDecimal downloadPrice;
+    private String mediaUrl;
+    private Integer previewPages;
 }

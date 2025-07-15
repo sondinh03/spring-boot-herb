@@ -48,4 +48,6 @@ public class Article extends BaseEntity {
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
+
+    private Integer favoritesCount;
 }
