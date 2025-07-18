@@ -11,6 +11,9 @@ import vnua.kltn.herb.exception.HerbException;
 public interface ExpertService {
     ExpertResponseDto create(ExpertRequestDto requestDto) throws HerbException;
 
+    Boolean update(Long id, ExpertRequestDto requestDto) throws HerbException;
+
+
     ExpertResponseDto getById(Long id) throws HerbException;
 
     Page<ExpertResponseDto> search(SearchDto searchDto);

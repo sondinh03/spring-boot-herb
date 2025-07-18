@@ -62,4 +62,7 @@ public class Research extends BaseEntity {
     @Max(value = 100, message = "Preview pages must not exceed 100")
     @Column(name = "preview_pages")
     private Integer previewPages;
+
+    @Column(name = "is_purchased")
+    private Boolean isPurchased;
 }

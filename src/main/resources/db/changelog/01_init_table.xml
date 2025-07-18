@@ -51,4 +51,16 @@
     <changeSet id="20250710_16_add_clm_tbl_expert" author="SonDC">
         <sqlFile path="db/sql/20250710_16_add_clm_tbl_expert.sql"/>
     </changeSet>
+    <changeSet id="20250716_17_add_clm_tbl_research" author="SonDC">
+        <sqlFile path="db/sql/20250716_17_add_clm_tbl_research.sql"/>
+    </changeSet>
+    <changeSet id="20250717_18_change_clm_tbl_research" author="SonDC">
+        <sqlFile path="db/sql/20250717_18_change_clm_tbl_research.sql"/>
+    </changeSet>
+    <changeSet id="20250718_19_add_tbl_research_purchase" author="SonDC">
+        <sqlFile path="db/sql/20250718_19_add_tbl_research_purchase.sql"/>
+    </changeSet>
+    <changeSet id="20250718_20_change_clm_tbl_research_purchase" author="SonDC">
+        <sqlFile path="db/sql/20250718_20_change_clm_tbl_research_purchase.sql"/>
+    </changeSet>
 </databaseChangeLog>

@@ -28,4 +28,5 @@ public class ResearchResponseDto extends BaseResponseDto {
     private BigDecimal downloadPrice;
     private String mediaUrl;
     private Integer previewPages;
+    private Boolean isPurchased;
 }

@@ -26,4 +26,5 @@ public class ResearchRequestDto {
     private Long mediaId;
     private BigDecimal downloadPrice;
     private Integer previewPages;
+    private Boolean isPurchased;
 }

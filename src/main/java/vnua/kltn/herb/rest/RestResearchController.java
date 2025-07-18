@@ -3,6 +3,7 @@ package vnua.kltn.herb.rest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vnua.kltn.herb.dto.request.ArticleRequestDto;
 import vnua.kltn.herb.dto.request.ResearchRequestDto;
@@ -38,5 +39,11 @@ public class RestResearchController {
     @GetMapping("/{id}")
     HerbResponse<ResearchResponseDto> getById(@PathVariable(value = "id") Long id) throws HerbException {
         return new HerbResponse<>(researchService.getById(id));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/purchase/{id}")
+    HerbResponse<Boolean> purchase(@PathVariable(value = "id") Long id) throws HerbException {
+        return new HerbResponse<>(researchService.purchase(id));
     }
 }
