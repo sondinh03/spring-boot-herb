@@ -1,6 +1,7 @@
 package vnua.kltn.herb.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.hibernate.HibernateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -127,7 +128,6 @@ public class ResearchServiceImpl extends BaseSearchService<Research, ResearchRes
         return response;
     }
 
-
     @Override
     public ResearchResponseDto getById(Long id) throws HerbException {
         if (id == null) {
@@ -145,13 +145,18 @@ public class ResearchServiceImpl extends BaseSearchService<Research, ResearchRes
         return response;
     }
 
-
-
     @Override
     public Page<ResearchResponseDto> search(SearchDto searchDto) {
         List<String> searchableFields = List.of("id", "title", "content", "journal");
 
         return super.search(searchDto, researchRepo, researchRepo, researchMapper::entityToResponse, searchableFields);
+    }
+    
+    public Boolean purchase(Long id) throws HerbException {
+        var research = researchRepo.findById(id).orElseThrow(() -> new HerbException(NOT_FOUND));
+        research.setIsPurchased(true);
+        researchRepo.save(research);
+        return true;
     }
 
 }

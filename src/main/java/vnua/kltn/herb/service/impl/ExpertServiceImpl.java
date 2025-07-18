@@ -57,6 +57,14 @@ public class ExpertServiceImpl extends BaseSearchService<Expert, ExpertResponseD
     }
 
     @Override
+    public Boolean update(Long id, ExpertRequestDto requestDto) throws HerbException {
+        var expert = expertRepo.findById(id).orElseThrow(() -> new HerbException(NOT_FOUND));
+        expertMapper.setValue(requestDto, expert);
+        expertRepo.save(expert);
+        return true;
+    }
+
+    @Override
     public ExpertResponseDto getById(Long id) throws HerbException {
         var expert = expertRepo.findById(id).orElseThrow(() -> new HerbException(NOT_FOUND));
         return expertMapper.entityToResponse(expert);

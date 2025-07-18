@@ -1,0 +1,2 @@
+ALTER TABLE research
+    ADD COLUMN isPurchased TINYINT(1) DEFAULT 0;

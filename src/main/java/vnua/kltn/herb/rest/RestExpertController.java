@@ -34,6 +34,11 @@ public class RestExpertController {
         return new HerbResponse<>(expertService.getById(id));
     }
 
+    @PutMapping("/{id}")
+    public HerbResponse<Boolean> update(@PathVariable("id") Long id, @RequestBody ExpertRequestDto requestDto) throws HerbException {
+        return new HerbResponse<>(expertService.update(id, requestDto));
+    }
+
     @GetMapping(value = "/search")
     HerbResponse<Page<ExpertResponseDto>> search(SearchDto dto) throws HerbException {
         return new HerbResponse<>(expertService.search(dto));

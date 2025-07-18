@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 import vnua.kltn.herb.dto.request.ArticleRequestDto;
 import vnua.kltn.herb.dto.response.ArticleResponseDto;
-import vnua.kltn.herb.dto.response.PlantResponseDto;
 import vnua.kltn.herb.dto.search.SearchDto;
 import vnua.kltn.herb.entity.Article;
 import vnua.kltn.herb.exception.HerbException;
@@ -44,27 +43,6 @@ public class ArticleServiceImpl extends BaseSearchService<Article, ArticleRespon
     public Page<ArticleResponseDto> search(SearchDto searchDto) {
         List<String> searchableFields = List.of("id", "title", "excerpt", "content", "diseaseId", "authorId");
         var articles = super.search(searchDto, articleRepo, articleRepo, articleMapper::entityToResponse, searchableFields);
-
-        /*
-        var articleIds = articles.getContent().stream().map(ArticleResponseDto::getId).toList();
-
-        var featuredMedias = articleMediaRepo.findByIdArticleIdInAndIsFeaturedTrue(articleIds);
-
-        Map<Long, ArticleMedia> mediaMap = featuredMedias.stream()
-                .collect(Collectors.toMap(
-                        am -> am.getId().getArticleId(),
-                        am -> am,
-                        (am1, am2) -> am1 // Giữ bản ghi đầu tiên nếu trùng
-                ));
-
-        return articles.map(article -> {
-            var media = mediaMap.get(article.getId());
-            if (media != null) {
-                article.setFeaturedImage(media.getId().getMediaId());
-            }
-            return article;
-        });
-         */
         return articles;
     }
 
