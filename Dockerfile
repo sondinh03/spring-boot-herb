@@ -5,6 +5,9 @@ WORKDIR /app
 # Copy toàn bộ project vào container
 COPY . .
 
+# Cấp quyền thực thi cho mvnw
+RUN chmod +x mvnw
+
 # Build project, tạo file JAR
 RUN ./mvnw clean package -DskipTests
 
