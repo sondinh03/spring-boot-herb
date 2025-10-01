@@ -14,4 +14,6 @@ public interface ArticleService {
     Page<ArticleResponseDto> search(SearchDto searchDto);
 
     Boolean update(Long id, ArticleRequestDto requestDto) throws HerbException;
+
+    Long getTotal();
 }

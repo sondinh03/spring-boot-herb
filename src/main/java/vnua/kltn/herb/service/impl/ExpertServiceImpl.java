@@ -75,4 +75,10 @@ public class ExpertServiceImpl extends BaseSearchService<Expert, ExpertResponseD
         List<String> searchableFields = List.of("name", "slug");
         return super.search(searchDto, expertRepo, expertRepo, expertMapper::entityToResponse, searchableFields);
     }
+
+    @Override
+    public Long getTotal() {
+        return expertRepo.count();
+    }
+
 }

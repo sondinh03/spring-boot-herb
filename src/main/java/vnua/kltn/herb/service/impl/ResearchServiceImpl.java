@@ -159,4 +159,8 @@ public class ResearchServiceImpl extends BaseSearchService<Research, ResearchRes
         return true;
     }
 
+    @Override
+    public Long getTotal() {
+        return researchRepo.count();
+    }
 }

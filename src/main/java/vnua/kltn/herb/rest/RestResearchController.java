@@ -46,4 +46,11 @@ public class RestResearchController {
     HerbResponse<Boolean> purchase(@PathVariable(value = "id") Long id) throws HerbException {
         return new HerbResponse<>(researchService.purchase(id));
     }
+
+    @GetMapping("/total")
+    HerbResponse<Long> getTotal() {
+        return new HerbResponse<>(researchService.getTotal());
+    }
+
+
 }

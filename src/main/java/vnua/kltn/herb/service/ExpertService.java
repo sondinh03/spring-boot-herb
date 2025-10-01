@@ -17,4 +17,6 @@ public interface ExpertService {
     ExpertResponseDto getById(Long id) throws HerbException;
 
     Page<ExpertResponseDto> search(SearchDto searchDto);
+
+    Long getTotal();
 }

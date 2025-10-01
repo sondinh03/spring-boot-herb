@@ -19,4 +19,6 @@ public interface PlantService {
     Boolean update(Long id, PlantRequestDto requestDto) throws HerbException;
 
     Boolean uploadMedia(Long plantId, MediaRequestDto requestDto) throws HerbException, IOException;
+
+    Long getTotal();
 }

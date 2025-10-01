@@ -30,6 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        // Skip JWT validation cho export endpoints
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/export/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Lấy JWT từ request
         String token = getJwtFromRequest(request);
 

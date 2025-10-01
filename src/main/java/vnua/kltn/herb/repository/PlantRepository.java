@@ -23,11 +23,6 @@ public interface PlantRepository extends JpaRepository<Plant, Long>, JpaSpecific
 
     Page<Plant> findAll(Specification<Plant> spec, Pageable pageable);
 
-    Optional<Plant> findBySlug(String slug);
-
-    Page<Plant> findByStatus(Integer status, Pageable pageable);
-
-    Page<Plant> findByFeatured(Boolean featured, Pageable pageable);
 
     @Query("SELECT p FROM Plant p WHERE p.name LIKE %?1% OR p.scientificName LIKE %?1% OR p.description LIKE %?1%")
     Page<Plant> search(String keyword, Pageable pageable);

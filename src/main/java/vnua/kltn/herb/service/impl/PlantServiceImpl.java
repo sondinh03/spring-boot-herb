@@ -169,4 +169,9 @@ public class PlantServiceImpl extends BaseSearchService<Plant, PlantResponseDto>
             throw new HerbException(ErrorCodeEnum.FILE_DATABASE_ERROR, "Lỗi khi lưu liên kết PlantMedia");
         }
     }
+
+    @Override
+    public Long getTotal() {
+        return plantRepo.count();
+    }
 }

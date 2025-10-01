@@ -40,4 +40,9 @@ public class RestUserController {
         var updatedUser = userService.update(id, requestDto);
         return new HerbResponse<>(updatedUser);
     }
+
+    @GetMapping("/total")
+    public HerbResponse<Long> getTotal() {
+        return new HerbResponse<>(userService.getTotal());
+    }
 }

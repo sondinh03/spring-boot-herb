@@ -36,4 +36,10 @@ public class RestArticleController {
     HerbResponse<Boolean> update(@PathVariable(value = "id") Long id, @RequestBody ArticleRequestDto requestDto) throws HerbException {
         return new HerbResponse<>(articleService.update(id, requestDto));
     }
+
+    @GetMapping("/total")
+    HerbResponse<Long> getTotal() {
+        return new HerbResponse<>(articleService.getTotal());
+    }
+
 }

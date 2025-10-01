@@ -9,6 +9,7 @@ import vnua.kltn.herb.constant.enums.ErrorCodeEnum;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HerbResponse<T> {
+    private boolean success;
     private int code;
     private String message;
     private T data;
