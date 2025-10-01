@@ -11,7 +11,8 @@
 	<groupId>vnua.kltn</groupId>
 	<artifactId>herb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+<!--	<packaging>war</packaging>-->
+	<packaging>jar</packaging>
 	<name>herb</name>
 	<description>Herb project for KLTN</description>
 	<url/>

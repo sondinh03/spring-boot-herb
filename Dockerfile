@@ -16,7 +16,7 @@ FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
 # Copy file jar từ giai đoạn build
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/herb.jar app.jar
 
 # Expose port (Render sẽ override bằng biến $PORT)
 EXPOSE 8080
