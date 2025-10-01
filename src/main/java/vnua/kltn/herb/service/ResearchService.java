@@ -21,4 +21,6 @@ public interface ResearchService {
     Page<ResearchResponseDto> search(SearchDto searchDto);
 
     Boolean purchase(Long id) throws HerbException;
+
+    Long getTotal();
 }

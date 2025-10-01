@@ -29,4 +29,6 @@ public interface UserService {
     Map<String, Object> refreshToken(String refreshToken) throws HerbException;
 
     Page<UserResponseDto> search(SearchDto searchDto);
+
+    Long getTotal();
 }

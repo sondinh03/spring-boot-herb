@@ -21,6 +21,7 @@ import vnua.kltn.herb.security.JwtAuthenticationEntryPoint;
 import vnua.kltn.herb.security.JwtAuthenticationFilter;
 import vnua.kltn.herb.service.impl.CustomUserDetailsService;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
@@ -61,9 +62,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/active-compound/**").permitAll()
                         .requestMatchers("/api/families/**").permitAll()
                         .requestMatchers("/api/genera/**").permitAll()
+                                .requestMatchers("/api/export/students/excel/secure").permitAll()
                         .requestMatchers("/api/articles/**").permitAll()
                         .requestMatchers("/api/favorites/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/export/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/expert/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/preview-pdf").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/plants/**").permitAll()
@@ -80,7 +83,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/experts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/research/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/users/total").permitAll()
+                                .requestMatchers("/api/users/**").permitAll()
 
                         .anyRequest().authenticated()
                 );

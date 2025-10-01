@@ -53,4 +53,9 @@ public class ArticleServiceImpl extends BaseSearchService<Article, ArticleRespon
         articleRepo.save(articleEntity);
         return true;
     }
+
+    @Override
+    public Long getTotal() {
+        return articleRepo.count();
+    }
 }

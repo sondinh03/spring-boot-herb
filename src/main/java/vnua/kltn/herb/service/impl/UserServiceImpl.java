@@ -258,4 +258,10 @@ public class UserServiceImpl extends BaseSearchService<User, UserResponseDto> im
         List<String> searchableFields = List.of("username", "email", "fullName");
         return super.search(searchDto, userRepo, userRepo, userMapper::entityToResponse, searchableFields);
     }
+
+    @Override
+    public Long getTotal() {
+        return userRepo.count();
+    }
+
 }

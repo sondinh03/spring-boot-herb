@@ -63,4 +63,7 @@
     <changeSet id="20250718_20_change_clm_tbl_research_purchase" author="SonDC">
         <sqlFile path="db/sql/20250718_20_change_clm_tbl_research_purchase.sql"/>
     </changeSet>
+    <changeSet id="20250718_21_addd_tbl_research_purchase" author="SonDC">
+        <sqlFile path="db/sql/20250718_21_addd_tbl_research_purchase.sql"/>
+    </changeSet>
 </databaseChangeLog>

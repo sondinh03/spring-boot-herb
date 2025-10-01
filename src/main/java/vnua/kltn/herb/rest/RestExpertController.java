@@ -43,4 +43,10 @@ public class RestExpertController {
     HerbResponse<Page<ExpertResponseDto>> search(SearchDto dto) throws HerbException {
         return new HerbResponse<>(expertService.search(dto));
     }
+
+    @GetMapping("/total")
+    HerbResponse<Long> getTotal() {
+        return new HerbResponse<>(expertService.getTotal());
+    }
+
 }

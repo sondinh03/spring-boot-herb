@@ -78,4 +78,9 @@ public class RestPlantController {
         requestDto.setFavoritableId(plantId);
         return new HerbResponse<>(favoriteService.toggleFavorite(requestDto));
     }
+
+    @GetMapping("/total")
+    public  HerbResponse<Long> getTotal() {
+        return new HerbResponse<>(plantService.getTotal());
+    }
 }
