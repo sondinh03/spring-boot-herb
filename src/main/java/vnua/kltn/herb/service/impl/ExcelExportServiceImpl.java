@@ -83,51 +83,6 @@ public class ExcelExportServiceImpl implements ExcelExportService {
         subtitleCell.setCellValue("Danh sách điểm " + tenKhoi + " - " + tenLop + "\n" + nienHoc);
         subtitleCell.setCellStyle(subtitleStyle);
 
-        // Tạo header row
-        /*
-        Row headerRow = sheet.createRow(4);
-        Cell sttCell = headerRow.createCell(0);
-        sttCell.setCellValue("Stt");
-        sttCell.setCellStyle(headerStyle);
-
-        Cell maHocVien = headerRow.createCell(1);
-        maHocVien.setCellValue("Mã số");
-        maHocVien.setCellStyle(headerStyle);
-
-        Cell tenThanhCell = headerRow.createCell(2);
-        tenThanhCell.setCellValue("Tên thánh");
-        tenThanhCell.setCellStyle(headerStyle);
-
-        Cell hoCell = headerRow.createCell(3);
-        hoCell.setCellValue("Họ");
-        hoCell.setCellStyle(headerStyle);
-
-        Cell tenCell = headerRow.createCell(4);
-        tenCell.setCellValue("Tên");
-        tenCell.setCellStyle(headerStyle);
-
-
-        int colIndex = 5;
-        int lastCol = 0;
-        Map<String, Integer> columnIndexMap = new HashMap<>();
-
-        for (StudentData student : ccamsResponse.getHocVien()) {
-            if (student.getData() != null) {
-                for (String maCotDiem : student.getData().keySet()) {
-                    if (!columnIndexMap.containsKey(maCotDiem)) {
-                        String tenCot = cotDiemMap.get(maCotDiem);
-                        Cell headerCell = headerRow.createCell(colIndex);
-                        headerCell.setCellValue(tenCot);
-                        headerCell.setCellStyle(headerStyle);
-                        columnIndexMap.put(maCotDiem, colIndex);
-                        colIndex++;
-                    }
-                }
-                lastCol = colIndex - 1;
-            }
-        }
-
-         */
         // Tạo header row và lấy column mapping
         Map<String, Integer> columnIndexMap = createHeaderRow(
                 sheet,
@@ -141,33 +96,6 @@ public class ExcelExportServiceImpl implements ExcelExportService {
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, lastCol));
         sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, lastCol));
 
-        /*
-        int rowIndex = 5;
-        int stt = 1;
-        for (StudentData student : ccamsResponse.getHocVien()) {
-            Row dataRow = sheet.createRow(rowIndex++);
-
-            setCell(dataRow, 0, String.valueOf(stt++), dataCellStyle);
-            setCell(dataRow, 1, student.getMaHocvien(), dataCellStyle);
-            setCell(dataRow, 2, student.getTenThanh(), dataCellStyle);
-            setCell(dataRow, 3, decodeUnicode(student.getHo()), dataCellStyle);
-            setCell(dataRow, 4, decodeUnicode(student.getTen()), nameCellStyle);
-
-            if (student.getData() != null) {
-                for (Map.Entry<String, ScoreData> entry : student.getData().entrySet()) {
-                    String maCotDiem = entry.getKey();
-                    ScoreData scoreData = entry.getValue();
-
-                    Integer colIdx = columnIndexMap.get(maCotDiem);
-                    var diem = scoreData.getDiemDat();
-                    if (colIdx != null && diem != null) {
-                        setCell(dataRow, colIdx, diem, dataCellStyle);
-                    }
-                }
-            }
-        }
-
-         */
         int lastRow = populateStudentData(
                 sheet,
                 ccamsResponse.getHocVien(),
